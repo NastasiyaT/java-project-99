@@ -19,7 +19,7 @@ jobs:
         with:
           gradle-version: 8.4
           arguments: build
-          build-root-directory: /
+          build-root-directory: java-project-99/
       - name: Publish code coverage
         uses: paambaati/codeclimate-action@v5.0.0
         env:

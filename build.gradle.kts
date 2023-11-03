@@ -27,6 +27,11 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter:3.1.0")
 	implementation("org.springframework.boot:spring-boot-starter-web:3.1.0")
 	implementation("org.springframework.boot:spring-boot-devtools:3.0.4")
+	compileOnly("org.projectlombok:lombok:1.18.30")
+	annotationProcessor("org.projectlombok:lombok:1.18.30")
+
+	testCompileOnly("org.projectlombok:lombok:1.18.30")
+	testAnnotationProcessor("org.projectlombok:lombok:1.18.30")
 	testImplementation("org.springframework.boot:spring-boot-starter-test:3.1.0")
 }
 

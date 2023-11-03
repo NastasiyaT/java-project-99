@@ -1,0 +1,12 @@
+server:
+  port: ${PORT}
+
+spring:
+  datasource:
+    url: jdbc:${PGDATABASE}
+    username: ${PGUSER}
+    password: ${PGPASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    database-platform: default

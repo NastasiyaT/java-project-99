@@ -23,11 +23,19 @@ public class EncodersConfig {
     @Autowired
     private RsaKeyProperties rsaKeys;
 
+    /**
+     * Get password encoder.
+     * @return password encoder that uses the BCrypt strong hashing function
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    /**
+     * Get JWT-encoder.
+     * @return Nimbus JWT-encoder with the given parameters
+     */
     @Bean
     JwtEncoder jwtEncoder() {
         JWK jwk = new RSAKey.Builder(rsaKeys.getPublicKey()).privateKey(rsaKeys.getPrivateKey()).build();
@@ -35,6 +43,10 @@ public class EncodersConfig {
         return new NimbusJwtEncoder(jwks);
     }
 
+    /**
+     * Get JWT-decoder.
+     * @return Nimbus JWT-decoder with the given parameters
+     */
     @Bean
     JwtDecoder jwtDecoder() {
         return NimbusJwtDecoder.withPublicKey(rsaKeys.getPublicKey()).build();

@@ -4,7 +4,6 @@ import hexlet.code.service.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -33,8 +32,15 @@ public class SecurityConfig {
     @Autowired
     private CustomUserDetailsService userService;
 
+    /**
+     * Get configuration for different security levels.
+     * @param http allows configuring web based security for specific http requests
+     * @param introspector gets information from the HandlerMapping that would serve a specific request
+     * @return filter chain which is capable of being matched against an HttpServletRequest
+     * in order to decide whether it applies to that request
+     */
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, HandlerMappingIntrospector introspector)
+        public SecurityFilterChain securityFilterChain(HttpSecurity http, HandlerMappingIntrospector introspector)
             throws Exception {
         var mvcMatcherBuilder = new MvcRequestMatcher.Builder(introspector);
         return http
@@ -50,14 +56,23 @@ public class SecurityConfig {
                 .build();
     }
 
+    /**
+     * Get authentication manager.
+     * @param http allows configuring web based security for specific http requests
+     * @return authentication manager that processes an authentication request
+     */
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
         return http.getSharedObject(AuthenticationManagerBuilder.class)
                 .build();
     }
 
+    /**
+     * Get authentication provider.
+     * @return authentication provider that can process a specific authentication implementation
+     */
     @Bean
-    public AuthenticationProvider daoAuthProvider(AuthenticationManagerBuilder auth) {
+    public AuthenticationProvider daoAuthProvider() {
         var provider = new DaoAuthenticationProvider();
         provider.setUserDetailsService(userService);
         provider.setPasswordEncoder(passwordEncoder);

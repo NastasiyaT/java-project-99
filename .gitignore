@@ -35,3 +35,13 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### Frontend Gradle Plugin ###
+.frontend-gradle-plugin/
+
+*.db
+
+node
+node_modules/
+package-lock.json
+package.json

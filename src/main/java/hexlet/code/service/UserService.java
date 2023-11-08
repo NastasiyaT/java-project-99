@@ -3,7 +3,7 @@ package hexlet.code.service;
 import hexlet.code.dto.UserCreateDTO;
 import hexlet.code.dto.UserDTO;
 import hexlet.code.dto.UserUpdateDTO;
-import hexlet.code.exception.UserNotFoundException;
+import hexlet.code.exception.ResourceNotFoundException;
 import hexlet.code.mapper.UserMapper;
 import hexlet.code.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +33,7 @@ public final class UserService {
 
     public UserDTO findById(Long id) {
         var user = userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException(String.format("User with ID %s not found", id)));
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("User with ID %s not found", id)));
         return userMapper.map(user);
     }
 
@@ -47,11 +47,11 @@ public final class UserService {
 
     public UserDTO update(UserUpdateDTO data, Long id) {
         var user = userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException(String.format("User with ID %s not found", id)));
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("User with ID %s not found", id)));
         userMapper.update(data, user);
 
         if (data.getPassword() != null) {
-            var passwordDigest = passwordEncoder.encode((CharSequence) data.getPassword());
+            var passwordDigest = passwordEncoder.encode(data.getPassword());
             user.setPasswordDigest(passwordDigest);
         }
 

@@ -1,29 +1,35 @@
 package hexlet.code.component;
 
+import hexlet.code.dto.TaskStatusCreateDTO;
+import hexlet.code.model.TaskStatus;
 import hexlet.code.model.User;
-import hexlet.code.repository.UserRepository;
+import hexlet.code.repository.TaskStatusRepository;
+import hexlet.code.service.TaskStatusService;
 import hexlet.code.service.UserService;
 import lombok.AllArgsConstructor;
-//import net.datafaker.Faker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
-//import java.util.stream.IntStream;
+import java.util.Map;
 
 @Component
 @AllArgsConstructor
 public final class DataInitializer implements ApplicationRunner {
 
-//    @Autowired
-//    private final PostRepository postRepository;
-
-    @Autowired
-    private final UserRepository userRepository;
+    private final Map<String, String> taskStatuses = Map.of(
+            "Draft", "draft",
+            "ToReview", "to_review",
+            "ToBeFixed", "to_be_fixed",
+            "ToPublish", "to_publish",
+            "Published", "published");
 
     @Autowired
     private final UserService userService;
+
+    @Autowired
+    private final TaskStatusRepository taskStatusRepository;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
@@ -33,17 +39,13 @@ public final class DataInitializer implements ApplicationRunner {
         userData.setPasswordDigest("qwerty");
         userService.createUser(userData);
 
-//        var user = userRepository.findByEmail(email).get();
-//
-//        var faker = new Faker();
-//        IntStream.range(1, 10).forEach(i -> {
-//            var post = new Post();
-//            post.setName(faker.book().title());
-//            var paragraphs = faker.lorem().paragraphs(5);
-//            post.setBody(String.join("\n", paragraphs));
-//            post.setSlug(faker.internet().slug());
-//            post.setAuthor(user);
-//            postRepository.save(post);
-//        });
+        var taskStatusNames = taskStatuses.keySet();
+        for (String name : taskStatusNames) {
+            var slug = taskStatuses.get(name);
+            var data = new TaskStatus();
+            data.setName(name);
+            data.setSlug(slug);
+            taskStatusRepository.save(data);
+        }
     }
 }

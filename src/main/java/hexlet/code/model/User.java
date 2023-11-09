@@ -39,8 +39,8 @@ public final class User implements UserDetails, BaseEntity {
     private String lastName;
 
     @NotBlank
-    @Column(unique = true)
     @Email
+    @Column(unique = true)
     private String email;
 
     @NotBlank

@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/task-statuses")
+@RequestMapping("/api/task_statuses")
 public final class TaskStatusesController {
 
     @Autowired
@@ -57,10 +57,16 @@ public final class TaskStatusesController {
 
     @PutMapping(path = "/{id}")
     public ResponseEntity<TaskStatusDTO> update(@Valid @RequestBody TaskStatusUpdateDTO data, @PathVariable Long id) {
-        var taskStatus = taskStatusService.update(data, id);
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(taskStatus);
+        try {
+            var taskStatus = taskStatusService.update(data, id);
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(taskStatus);
+        } catch (Exception e) {
+            return ResponseEntity
+                    .status(HttpStatus.FORBIDDEN)
+                    .build();
+        }
     }
 
     @DeleteMapping(path = "/{id}")

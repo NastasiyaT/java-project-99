@@ -64,13 +64,13 @@ public final class UserControllerTest {
                 .andExpect(status().isOk());
     }
 
-//    @Test
-//    public void testShowFail() throws Exception {
-//        var userId = testUser.getId() + 100500;
-//        var request = get("/api/users/" + userId).with(token);
-//        mockMvc.perform(request)
-//                .andExpect(status().isNotFound());
-//    }
+    @Test
+    public void testShowFail() throws Exception {
+        var userId = testUser.getId() + 100500;
+        var request = get("/api/users/" + userId).with(token);
+        mockMvc.perform(request)
+                .andExpect(status().isForbidden());
+    }
 
     @Test
     public void testIndex() throws Exception {

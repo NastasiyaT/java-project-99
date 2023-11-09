@@ -1,7 +1,6 @@
 package hexlet.code.util;
 
 import hexlet.code.dto.UserCreateDTO;
-import hexlet.code.model.User;
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import net.datafaker.Faker;

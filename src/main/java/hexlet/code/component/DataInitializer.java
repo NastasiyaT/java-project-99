@@ -2,7 +2,7 @@ package hexlet.code.component;
 
 import hexlet.code.model.User;
 import hexlet.code.repository.UserRepository;
-import hexlet.code.service.CustomUserDetailsService;
+import hexlet.code.service.UserService;
 import lombok.AllArgsConstructor;
 //import net.datafaker.Faker;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +23,7 @@ public final class DataInitializer implements ApplicationRunner {
     private final UserRepository userRepository;
 
     @Autowired
-    private final CustomUserDetailsService userService;
+    private final UserService userService;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {

@@ -1,4 +1,4 @@
-package hexlet.code.controller.api;
+package hexlet.code.controller;
 
 import hexlet.code.dto.AuthRequest;
 import hexlet.code.util.JWTUtils;
@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/login")
 public final class AuthenticationController {
 
     @Autowired
@@ -22,7 +22,7 @@ public final class AuthenticationController {
     @Autowired
     private AuthenticationManager authenticationManager;
 
-    @PostMapping("/login")
+    @PostMapping
     @ResponseStatus(HttpStatus.ACCEPTED)
     String create(@RequestBody AuthRequest authRequest) {
         var authentication = new UsernamePasswordAuthenticationToken(

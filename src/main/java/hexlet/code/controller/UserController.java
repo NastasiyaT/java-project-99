@@ -1,4 +1,4 @@
-package hexlet.code.controller.api;
+package hexlet.code.controller;
 
 import hexlet.code.dto.UserCreateDTO;
 import hexlet.code.dto.UserDTO;
@@ -9,6 +9,7 @@ import hexlet.code.util.UserUtils;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.Objects;
 
@@ -37,61 +37,59 @@ public final class UserController {
     private UserUtils userUtils;
 
     @GetMapping(path = "/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    public UserDTO show(@PathVariable Long id) throws Exception {
+    public ResponseEntity<UserDTO> show(@PathVariable Long id) {
         var currentUser = userUtils.getCurrentUser();
 
-        if (Objects.equals(currentUser.getId(), id)) {
-            throw new AccessDeniedException("Access forbidden");
+        if (!Objects.equals(currentUser.getId(), id)) {
+            return ResponseEntity
+                    .status(HttpStatus.FORBIDDEN)
+                    .build();
         } else {
-            return userService.findById(id);
+            var user = userService.findById(id);
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(user);
         }
     }
 
     @GetMapping(path = "")
-    @ResponseStatus(HttpStatus.OK)
-    public List<UserDTO> index() throws Exception{
-        var currentUser = userUtils.getCurrentUser();
-
-        if (!userRepository.existsById(currentUser.getId())) {
-            throw new AccessDeniedException("Access forbidden");
-        } else {
-            return userService.getAll();
-        }
+    public ResponseEntity<List<UserDTO>> index() {
+        var users = userService.getAll();
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(users);
     }
 
     @PostMapping(path = "")
-    @ResponseStatus(HttpStatus.CREATED)
-    public UserDTO create(@Valid @RequestBody UserCreateDTO data) throws Exception {
-        var currentUser = userUtils.getCurrentUser();
-
-        if (!userRepository.existsById(currentUser.getId())) {
-            throw new AccessDeniedException("Access forbidden");
-        } else {
-            return userService.create(data);
-        }
+    public ResponseEntity<UserDTO> create(@Valid @RequestBody UserCreateDTO data) {
+        var user = userService.create(data);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(user);
     }
 
     @PutMapping(path = "/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    public UserDTO update(@Valid @RequestBody UserUpdateDTO data, @PathVariable Long id) throws Exception {
+    public ResponseEntity<UserDTO> update(@Valid @RequestBody UserUpdateDTO data, @PathVariable Long id) {
         var currentUser = userUtils.getCurrentUser();
 
         if (!Objects.equals(currentUser.getId(), id)) {
-            throw new AccessDeniedException("Access forbidden");
+            return ResponseEntity
+                    .status(HttpStatus.FORBIDDEN)
+                    .build();
         } else {
-            return userService.update(data, id);
+            var user = userService.update(data, id);
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(user);
         }
     }
 
     @DeleteMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    void delete(@PathVariable Long id) throws Exception {
+    void delete(@PathVariable Long id) {
         var currentUser = userUtils.getCurrentUser();
 
-        if (!Objects.equals(currentUser.getId(), id)) {
-            throw new AccessDeniedException("Access forbidden");
-        } else {
+        if (Objects.equals(currentUser.getId(), id)) {
             userService.delete(id);
         }
     }

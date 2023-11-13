@@ -50,8 +50,7 @@ public final class UserControllerTest {
 
     @BeforeEach
     public void setUp() {
-        var userCreateDTO = Instancio.of(modelGenerator.getUserCreateDTOModel()).create();
-        testUser = userMapper.map(userCreateDTO);
+        testUser = Instancio.of(modelGenerator.getUserModel()).create();
         userRepository.save(testUser);
         token = jwt().jwt(builder -> builder.subject(testUser.getEmail()));
     }
@@ -81,16 +80,16 @@ public final class UserControllerTest {
 
     @Test
     public void testCreate() throws Exception {
-        var userDTO = Instancio.of(modelGenerator.getUserCreateDTOModel()).create();
+        var userCreateDTO = Instancio.of(modelGenerator.getUserCreateDTOModel()).create();
         var request = post("/api/users").with(token)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(om.writeValueAsString(userDTO));
+                .content(om.writeValueAsString(userCreateDTO));
 
         mockMvc.perform(request)
                 .andExpect(status().isCreated());
 
-        var user = userRepository.findByFirstName(userDTO.getFirstName()).get();
-        assertThat(userDTO.getEmail()).isEqualTo(user.getEmail());
+        var user = userRepository.findByFirstName(userCreateDTO.getFirstName()).get();
+        assertThat(userCreateDTO.getEmail()).isEqualTo(user.getEmail());
         assertThat(user.getCreatedAt()).isNotNull();
     }
 

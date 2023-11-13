@@ -48,13 +48,14 @@ public class SecurityConfig {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(mvcMatcherBuilder.pattern("/")).anonymous()
-                        .requestMatchers(mvcMatcherBuilder.pattern("/api/login")).anonymous()
+                        .requestMatchers(mvcMatcherBuilder.pattern("/")).permitAll()
+                        .requestMatchers(mvcMatcherBuilder.pattern("/api/login")).permitAll()
                         .requestMatchers(mvcMatcherBuilder.pattern("/api/users/**")).authenticated()
                         .requestMatchers(mvcMatcherBuilder.pattern("/api/task_statuses/**")).authenticated()
+                        .requestMatchers(mvcMatcherBuilder.pattern("/api/tasks/**")).authenticated())
 //                        .requestMatchers(mvcMatcherBuilder.pattern("/index.html")).permitAll()
 //                        .requestMatchers(mvcMatcherBuilder.pattern("/assets/**")).permitAll()
-                        .anyRequest().authenticated())
+//                        .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .oauth2ResourceServer(rs -> rs.jwt(jwt -> jwt.decoder(jwtDecoder)))
                 .httpBasic(Customizer.withDefaults())

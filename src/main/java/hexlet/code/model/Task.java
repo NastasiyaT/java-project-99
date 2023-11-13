@@ -1,31 +1,28 @@
 package hexlet.code.model;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
-@Table(name = "task_statuses")
+@Table(name = "tasks")
 @EntityListeners(AuditingEntityListener.class)
 @Getter
 @Setter
-public final class TaskStatus implements BaseEntity {
+public final class Task implements BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,13 +31,17 @@ public final class TaskStatus implements BaseEntity {
     @NotBlank
     private String name;
 
-    @NotBlank
-    @Column(unique = true)
-    private String slug;
+    private Integer index;
+
+    private String description;
+
+    @NotNull
+    @ManyToOne(fetch = FetchType.EAGER)
+    private TaskStatus taskStatus;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    private User assignee;
 
     @CreatedDate
     private LocalDate createdAt;
-
-    @OneToMany(mappedBy = "taskStatus", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Task> tasks = new ArrayList<>();
 }

@@ -3,7 +3,6 @@ package hexlet.code.controller;
 import hexlet.code.dto.UserCreateDTO;
 import hexlet.code.dto.UserDTO;
 import hexlet.code.dto.UserUpdateDTO;
-import hexlet.code.repository.UserRepository;
 import hexlet.code.service.UserService;
 import hexlet.code.util.UserUtils;
 import jakarta.validation.Valid;
@@ -26,9 +25,6 @@ import java.util.Objects;
 @RestController
 @RequestMapping("/api/users")
 public final class UserController {
-
-    @Autowired
-    private UserRepository userRepository;
 
     @Autowired
     private UserService userService;
@@ -74,13 +70,19 @@ public final class UserController {
 
         if (!Objects.equals(currentUser.getId(), id)) {
             return ResponseEntity
-                    .status(HttpStatus.FORBIDDEN)
+                    .status(HttpStatus.UNAUTHORIZED)
                     .build();
         } else {
-            var user = userService.update(data, id);
-            return ResponseEntity
-                    .status(HttpStatus.OK)
-                    .body(user);
+            try {
+                var user = userService.update(data, id);
+                return ResponseEntity
+                        .status(HttpStatus.OK)
+                        .body(user);
+            } catch (Exception e) {
+                return ResponseEntity
+                        .status(HttpStatus.FORBIDDEN)
+                        .build();
+            }
         }
     }
 

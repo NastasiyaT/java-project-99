@@ -68,7 +68,13 @@ public final class UserService implements UserDetailsManager {
     }
 
     public void delete(Long id) {
-        userRepository.deleteById(id);
+        var user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("User with ID %s not found", id)));
+        var tasks = user.getTasks();
+
+        if (tasks.isEmpty()) {
+            userRepository.deleteById(id);
+        }
     }
 
     @Override

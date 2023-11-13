@@ -48,6 +48,12 @@ public final class TaskStatusService {
     }
 
     public void delete(Long id) {
-        taskStatusRepository.deleteById(id);
+        var taskStatus = taskStatusRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("Task status with ID %s not found", id)));
+        var tasks = taskStatus.getTasks();
+
+        if (tasks.isEmpty()) {
+            taskStatusRepository.deleteById(id);
+        }
     }
 }

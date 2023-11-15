@@ -1,8 +1,10 @@
 package hexlet.code.util;
 
-import hexlet.code.dto.TaskCreateDTO;
-import hexlet.code.dto.TaskStatusCreateDTO;
-import hexlet.code.dto.UserCreateDTO;
+import hexlet.code.dto.label.LabelModifyDTO;
+import hexlet.code.dto.task.TaskModifyDTO;
+import hexlet.code.dto.task_status.TaskStatusModifyDTO;
+import hexlet.code.dto.user.UserModifyDTO;
+import hexlet.code.model.Label;
 import hexlet.code.model.Task;
 import hexlet.code.model.TaskStatus;
 import hexlet.code.model.User;
@@ -21,11 +23,16 @@ import org.springframework.stereotype.Component;
 public class ModelGenerator {
 
     private Model<User> userModel;
-    private Model<UserCreateDTO> userCreateDTOModel;
+    private Model<UserModifyDTO> userCreateDTOModel;
+
     private Model<TaskStatus> taskStatusModel;
-    private Model<TaskStatusCreateDTO> taskStatusCreateDTOModel;
+    private Model<TaskStatusModifyDTO> taskStatusModifyDTOModel;
+
     private Model<Task> taskModel;
-    private Model<TaskCreateDTO> taskCreateDTOModel;
+    private Model<TaskModifyDTO> taskModifyDTOModel;
+
+    private Model<Label> labelModel;
+    private Model<LabelModifyDTO> labelModifyDTOModel;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -45,11 +52,11 @@ public class ModelGenerator {
                 .supply(Select.field(User::getEmail), () -> faker.internet().emailAddress())
                 .toModel();
 
-        userCreateDTOModel = Instancio.of(UserCreateDTO.class)
-                .supply(Select.field(UserCreateDTO::getFirstName), () -> faker.name().firstName())
-                .supply(Select.field(UserCreateDTO::getLastName), () -> faker.name().lastName())
-                .supply(Select.field(UserCreateDTO::getPassword), () -> faker.internet().password(3, 8))
-                .supply(Select.field(UserCreateDTO::getEmail), () -> faker.internet().emailAddress())
+        userCreateDTOModel = Instancio.of(UserModifyDTO.class)
+                .supply(Select.field(UserModifyDTO::getFirstName), () -> faker.name().firstName())
+                .supply(Select.field(UserModifyDTO::getLastName), () -> faker.name().lastName())
+                .supply(Select.field(UserModifyDTO::getPassword), () -> faker.internet().password(3, 8))
+                .supply(Select.field(UserModifyDTO::getEmail), () -> faker.internet().emailAddress())
                 .toModel();
 
         taskStatusModel = Instancio.of(TaskStatus.class)
@@ -60,9 +67,9 @@ public class ModelGenerator {
                 .supply(Select.field(TaskStatus::getSlug), () -> faker.internet().slug())
                 .toModel();
 
-        taskStatusCreateDTOModel = Instancio.of(TaskStatusCreateDTO.class)
-                .supply(Select.field(TaskStatusCreateDTO::getName), () -> faker.lorem().word())
-                .supply(Select.field(TaskStatusCreateDTO::getSlug), () -> faker.internet().slug())
+        taskStatusModifyDTOModel = Instancio.of(TaskStatusModifyDTO.class)
+                .supply(Select.field(TaskStatusModifyDTO::getName), () -> faker.lorem().word())
+                .supply(Select.field(TaskStatusModifyDTO::getSlug), () -> faker.internet().slug())
                 .toModel();
 
         taskModel = Instancio.of(Task.class)
@@ -70,17 +77,30 @@ public class ModelGenerator {
                 .ignore(Select.field(Task::getCreatedAt))
                 .ignore(Select.field(Task::getTaskStatus))
                 .ignore(Select.field(Task::getAssignee))
+                .ignore(Select.field(Task::getLabels))
                 .supply(Select.field(Task::getName), () -> faker.lorem().word())
-                .supply(Select.field(Task::getDescription), () -> faker.text().text())
+                .supply(Select.field(Task::getDescription), () -> faker.lorem().sentence())
                 .supply(Select.field(Task::getIndex), () -> faker.number().positive())
                 .toModel();
 
-        taskCreateDTOModel = Instancio.of(TaskCreateDTO.class)
-                .ignore(Select.field(TaskCreateDTO::getAssigneeId))
-                .ignore(Select.field(TaskCreateDTO::getStatus))
-                .supply(Select.field(TaskCreateDTO::getIndex), () -> faker.number().positive())
-                .supply(Select.field(TaskCreateDTO::getTitle), () -> faker.lorem().word())
-                .supply(Select.field(TaskCreateDTO::getContent), () -> faker.text().text())
+        taskModifyDTOModel = Instancio.of(TaskModifyDTO.class)
+                .ignore(Select.field(TaskModifyDTO::getAssigneeId))
+                .ignore(Select.field(TaskModifyDTO::getStatus))
+                .ignore(Select.field(TaskModifyDTO::getLabelNames))
+                .supply(Select.field(TaskModifyDTO::getIndex), () -> faker.number().positive())
+                .supply(Select.field(TaskModifyDTO::getTitle), () -> faker.lorem().word())
+                .supply(Select.field(TaskModifyDTO::getContent), () -> faker.lorem().sentence())
+                .toModel();
+
+        labelModel = Instancio.of(Label.class)
+                .ignore(Select.field(Label::getId))
+                .ignore(Select.field(Label::getCreatedAt))
+                .ignore(Select.field(Label::getTasks))
+                .supply(Select.field(Label::getName), () -> faker.text().text(3, 1000))
+                .toModel();
+
+        labelModifyDTOModel = Instancio.of(LabelModifyDTO.class)
+                .supply(Select.field(LabelModifyDTO::getName), () -> faker.text().text(3, 1000))
                 .toModel();
     }
 }

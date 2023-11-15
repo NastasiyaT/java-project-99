@@ -1,8 +1,7 @@
 package hexlet.code.controller;
 
-import hexlet.code.dto.TaskCreateDTO;
-import hexlet.code.dto.TaskDTO;
-import hexlet.code.dto.TaskUpdateDTO;
+import hexlet.code.dto.task.TaskDTO;
+import hexlet.code.dto.task.TaskModifyDTO;
 import hexlet.code.repository.TaskRepository;
 import hexlet.code.service.TaskService;
 import jakarta.validation.Valid;
@@ -48,15 +47,21 @@ public final class TaskController {
     }
 
     @PostMapping(path = "")
-    public ResponseEntity<TaskDTO> create(@Valid @RequestBody TaskCreateDTO data) {
-        var task = taskService.create(data);
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(task);
+    public ResponseEntity<TaskDTO> create(@Valid @RequestBody TaskModifyDTO data) {
+        try {
+            var task = taskService.create(data);
+            return ResponseEntity
+                    .status(HttpStatus.CREATED)
+                    .body(task);
+        } catch (Exception e) {
+            return ResponseEntity
+                    .status(HttpStatus.FORBIDDEN)
+                    .build();
+        }
     }
 
     @PutMapping(path = "/{id}")
-    public ResponseEntity<TaskDTO> update(@Valid @RequestBody TaskUpdateDTO data, @PathVariable Long id) {
+    public ResponseEntity<TaskDTO> update(@Valid @RequestBody TaskModifyDTO data, @PathVariable Long id) {
         try {
             var task = taskService.update(data, id);
             return ResponseEntity
@@ -71,7 +76,7 @@ public final class TaskController {
 
     @DeleteMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    void delete(@PathVariable Long id) {
+    public void delete(@PathVariable Long id) {
         taskService.delete(id);
     }
 }

@@ -1,8 +1,7 @@
 package hexlet.code.service;
 
-import hexlet.code.dto.UserCreateDTO;
-import hexlet.code.dto.UserDTO;
-import hexlet.code.dto.UserUpdateDTO;
+import hexlet.code.dto.user.UserModifyDTO;
+import hexlet.code.dto.user.UserDTO;
 import hexlet.code.exception.ResourceNotFoundException;
 import hexlet.code.mapper.UserMapper;
 import hexlet.code.model.User;
@@ -45,24 +44,17 @@ public final class UserService implements UserDetailsManager {
         return userMapper.map(user);
     }
 
-    public UserDTO create(UserCreateDTO data) {
-        var passwordDigest = passwordEncoder.encode(data.getPassword());
-        var user = userMapper.map(data);
-        user.setPasswordDigest(passwordDigest);
+    public UserDTO create(UserModifyDTO data) {
+        var user = new User();
+        merge(user, data);
         userRepository.save(user);
         return userMapper.map(user);
     }
 
-    public UserDTO update(UserUpdateDTO data, Long id) {
+    public UserDTO update(UserModifyDTO data, Long id) {
         var user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format("User with ID %s not found", id)));
-        userMapper.update(data, user);
-
-        if (data.getPassword() != null) {
-            var passwordDigest = passwordEncoder.encode(data.getPassword());
-            user.setPasswordDigest(passwordDigest);
-        }
-
+        merge(user, data);
         userRepository.save(user);
         return userMapper.map(user);
     }
@@ -110,5 +102,21 @@ public final class UserService implements UserDetailsManager {
     @Override
     public boolean userExists(String username) {
         throw new UnsupportedOperationException("Unimplemented method 'userExists'");
+    }
+
+    private void merge(User model, UserModifyDTO data) {
+        if (data.getFirstName() != null) {
+            model.setFirstName(data.getFirstName());
+        }
+        if (data.getLastName() != null) {
+            model.setLastName(data.getLastName());
+        }
+        if (data.getEmail() != null) {
+            model.setEmail(data.getEmail());
+        }
+        if (data.getPassword() != null) {
+            var passwordDigest = passwordEncoder.encode(data.getPassword());
+            model.setPasswordDigest(passwordDigest);
+        }
     }
 }

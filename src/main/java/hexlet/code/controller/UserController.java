@@ -1,8 +1,7 @@
 package hexlet.code.controller;
 
-import hexlet.code.dto.UserCreateDTO;
-import hexlet.code.dto.UserDTO;
-import hexlet.code.dto.UserUpdateDTO;
+import hexlet.code.dto.user.UserModifyDTO;
+import hexlet.code.dto.user.UserDTO;
 import hexlet.code.service.UserService;
 import hexlet.code.util.UserUtils;
 import jakarta.validation.Valid;
@@ -57,15 +56,21 @@ public final class UserController {
     }
 
     @PostMapping(path = "")
-    public ResponseEntity<UserDTO> create(@Valid @RequestBody UserCreateDTO data) {
-        var user = userService.create(data);
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(user);
+    public ResponseEntity<UserDTO> create(@Valid @RequestBody UserModifyDTO data) {
+        try {
+            var user = userService.create(data);
+            return ResponseEntity
+                    .status(HttpStatus.CREATED)
+                    .body(user);
+        } catch (Exception e) {
+            return ResponseEntity
+                    .status(HttpStatus.FORBIDDEN)
+                    .build();
+        }
     }
 
     @PutMapping(path = "/{id}")
-    public ResponseEntity<UserDTO> update(@Valid @RequestBody UserUpdateDTO data, @PathVariable Long id) {
+    public ResponseEntity<UserDTO> update(@Valid @RequestBody UserModifyDTO data, @PathVariable Long id) {
         var currentUser = userUtils.getCurrentUser();
 
         if (!Objects.equals(currentUser.getId(), id)) {
@@ -88,7 +93,7 @@ public final class UserController {
 
     @DeleteMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    void delete(@PathVariable Long id) {
+    public void delete(@PathVariable Long id) {
         var currentUser = userUtils.getCurrentUser();
 
         if (Objects.equals(currentUser.getId(), id)) {

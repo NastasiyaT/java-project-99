@@ -1,19 +1,14 @@
 package hexlet.code;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import hexlet.code.mapper.TaskMapper;
-import hexlet.code.mapper.TaskStatusMapper;
-import hexlet.code.mapper.UserMapper;
 import hexlet.code.model.Task;
 import hexlet.code.model.TaskStatus;
-import hexlet.code.model.User;
 import hexlet.code.repository.TaskRepository;
 import hexlet.code.repository.TaskStatusRepository;
 import hexlet.code.repository.UserRepository;
 import hexlet.code.util.ModelGenerator;
 import org.instancio.Instancio;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +17,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -56,6 +50,8 @@ public final class TaskControllerTest {
     @Autowired
     private ObjectMapper om;
 
+    private TaskStatus testTaskStatus;
+
     private Task testTask;
 
     private JwtRequestPostProcessor token;
@@ -66,20 +62,21 @@ public final class TaskControllerTest {
         userRepository.save(testUser);
         token = jwt().jwt(builder -> builder.subject(testUser.getEmail()));
 
-        var testTaskStatus = Instancio.of(modelGenerator.getTaskStatusModel()).create();
-        taskStatusRepository.save(testTaskStatus);
+        testTaskStatus = Instancio.of(modelGenerator.getTaskStatusModel()).create();
 
         testTask = Instancio.of(modelGenerator.getTaskModel()).create();
         testTask.setAssignee(testUser);
         testTask.setTaskStatus(testTaskStatus);
-        taskRepository.save(testTask);
+
+        testTaskStatus.getTasks().add(testTask);
+        taskStatusRepository.save(testTaskStatus);
     }
 
     @AfterEach
     public void clear() {
-        userRepository.deleteAll();
         taskStatusRepository.deleteAll();
         taskRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
     @Test
@@ -114,10 +111,8 @@ public final class TaskControllerTest {
 
     @Test
     public void testCreate() throws Exception {
-        var statuses = taskStatusRepository.findAll();
-
-        var taskCreateDTO = Instancio.of(modelGenerator.getTaskCreateDTOModel()).create();
-        taskCreateDTO.setStatus(statuses.get(0).getSlug());
+        var taskCreateDTO = Instancio.of(modelGenerator.getTaskModifyDTOModel()).create();
+        taskCreateDTO.setStatus(testTaskStatus.getSlug());
 
         var request = post("/api/tasks").with(token)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -132,7 +127,8 @@ public final class TaskControllerTest {
 
     @Test
     public void testCreateFail() throws Exception {
-        var taskCreateDTO = Instancio.of(modelGenerator.getTaskCreateDTOModel()).create();
+        var taskCreateDTO = Instancio.of(modelGenerator.getTaskModifyDTOModel()).create();
+        taskCreateDTO.setStatus("абракадабра");
         var request = post("/api/tasks").with(token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(taskCreateDTO));

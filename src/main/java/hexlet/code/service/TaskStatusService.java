@@ -1,10 +1,10 @@
 package hexlet.code.service;
 
-import hexlet.code.dto.TaskStatusCreateDTO;
-import hexlet.code.dto.TaskStatusDTO;
-import hexlet.code.dto.TaskStatusUpdateDTO;
+import hexlet.code.dto.task_status.TaskStatusModifyDTO;
+import hexlet.code.dto.task_status.TaskStatusDTO;
 import hexlet.code.exception.ResourceNotFoundException;
 import hexlet.code.mapper.TaskStatusMapper;
+import hexlet.code.model.TaskStatus;
 import hexlet.code.repository.TaskStatusRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,16 +33,17 @@ public final class TaskStatusService {
         return taskStatusMapper.map(taskStatus);
     }
 
-    public TaskStatusDTO create(TaskStatusCreateDTO data) {
-        var taskStatus = taskStatusMapper.map(data);
+    public TaskStatusDTO create(TaskStatusModifyDTO data) {
+        var taskStatus = new TaskStatus();
+        merge(taskStatus, data);
         taskStatusRepository.save(taskStatus);
         return taskStatusMapper.map(taskStatus);
     }
 
-    public TaskStatusDTO update(TaskStatusUpdateDTO data, Long id) {
+    public TaskStatusDTO update(TaskStatusModifyDTO data, Long id) {
         var taskStatus = taskStatusRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format("Task status with ID %s not found", id)));
-        taskStatusMapper.update(data, taskStatus);
+        merge(taskStatus, data);
         taskStatusRepository.save(taskStatus);
         return taskStatusMapper.map(taskStatus);
     }
@@ -54,6 +55,15 @@ public final class TaskStatusService {
 
         if (tasks.isEmpty()) {
             taskStatusRepository.deleteById(id);
+        }
+    }
+
+    private void merge(TaskStatus model, TaskStatusModifyDTO data) {
+        if (data.getName() != null) {
+            model.setName(data.getName());
+        }
+        if (data.getSlug() != null) {
+            model.setSlug(data.getSlug());
         }
     }
 }

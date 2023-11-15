@@ -53,7 +53,6 @@ public final class User implements UserDetails, BaseEntity {
     @CreatedDate
     private LocalDate createdAt;
 
-    @JsonIgnore
     @LastModifiedDate
     private LocalDate updatedAt;
 

@@ -1,8 +1,9 @@
 package hexlet.code.controller;
 
-import hexlet.code.dto.task_status.TaskStatusModifyDTO;
-import hexlet.code.dto.task_status.TaskStatusDTO;
-import hexlet.code.service.TaskStatusService;
+import hexlet.code.dto.label.LabelModifyDTO;
+import hexlet.code.dto.label.LabelDTO;
+import hexlet.code.repository.LabelRepository;
+import hexlet.code.service.LabelService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,35 +21,38 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/task_statuses")
-public final class TaskStatusesController {
+@RequestMapping("/api/labels")
+public final class LabelController {
 
     @Autowired
-    private TaskStatusService taskStatusService;
+    private LabelRepository labelRepository;
+
+    @Autowired
+    private LabelService labelService;
 
     @GetMapping(path = "/{id}")
-    public ResponseEntity<TaskStatusDTO> show(@PathVariable Long id) {
-        var taskStatus = taskStatusService.findById(id);
+    public ResponseEntity<LabelDTO> show(@PathVariable Long id) {
+        var label = labelService.findById(id);
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(taskStatus);
+                .body(label);
     }
 
     @GetMapping(path = "")
-    public ResponseEntity<List<TaskStatusDTO>> index() {
-        var taskStatuses = taskStatusService.getAll();
+    public ResponseEntity<List<LabelDTO>> index() {
+        var labels = labelService.getAll();
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(taskStatuses);
+                .body(labels);
     }
 
     @PostMapping(path = "")
-    public ResponseEntity<TaskStatusDTO> create(@Valid @RequestBody TaskStatusModifyDTO data) {
+    public ResponseEntity<LabelDTO> create(@Valid @RequestBody LabelModifyDTO data) {
         try {
-            var taskStatus = taskStatusService.create(data);
+            var label = labelService.create(data);
             return ResponseEntity
                     .status(HttpStatus.CREATED)
-                    .body(taskStatus);
+                    .body(label);
         } catch (Exception e) {
             return ResponseEntity
                     .status(HttpStatus.FORBIDDEN)
@@ -57,12 +61,12 @@ public final class TaskStatusesController {
     }
 
     @PutMapping(path = "/{id}")
-    public ResponseEntity<TaskStatusDTO> update(@Valid @RequestBody TaskStatusModifyDTO data, @PathVariable Long id) {
+    public ResponseEntity<LabelDTO> update(@Valid @RequestBody LabelModifyDTO data, @PathVariable Long id) {
         try {
-            var taskStatus = taskStatusService.update(data, id);
+            var label = labelService.update(data, id);
             return ResponseEntity
                     .status(HttpStatus.OK)
-                    .body(taskStatus);
+                    .body(label);
         } catch (Exception e) {
             return ResponseEntity
                     .status(HttpStatus.FORBIDDEN)
@@ -72,7 +76,7 @@ public final class TaskStatusesController {
 
     @DeleteMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable Long id) {
-        taskStatusService.delete(id);
+    void delete(@PathVariable Long id) {
+        labelService.delete(id);
     }
 }

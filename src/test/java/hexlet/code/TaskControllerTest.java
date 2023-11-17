@@ -1,8 +1,10 @@
 package hexlet.code;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import hexlet.code.model.Label;
 import hexlet.code.model.Task;
 import hexlet.code.model.TaskStatus;
+import hexlet.code.repository.LabelRepository;
 import hexlet.code.repository.TaskRepository;
 import hexlet.code.repository.TaskStatusRepository;
 import hexlet.code.repository.UserRepository;
@@ -45,6 +47,9 @@ public final class TaskControllerTest {
     private TaskRepository taskRepository;
 
     @Autowired
+    private LabelRepository labelRepository;
+
+    @Autowired
     private ModelGenerator modelGenerator;
 
     @Autowired
@@ -53,6 +58,8 @@ public final class TaskControllerTest {
     private TaskStatus testTaskStatus;
 
     private Task testTask;
+
+    private Label testLabel;
 
     private JwtRequestPostProcessor token;
 
@@ -70,6 +77,15 @@ public final class TaskControllerTest {
 
         testTaskStatus.getTasks().add(testTask);
         taskStatusRepository.save(testTaskStatus);
+
+        testLabel = Instancio.of(modelGenerator.getLabelModel()).create();
+        var label1 = Instancio.of(modelGenerator.getLabelModel()).create();
+        var label2 = Instancio.of(modelGenerator.getLabelModel()).create();
+        testTask.getLabels().add(testLabel);
+        testLabel.getTasks().add(testTask);
+        labelRepository.save(testLabel);
+        labelRepository.save(label1);
+        labelRepository.save(label2);
     }
 
     @AfterEach
@@ -98,6 +114,31 @@ public final class TaskControllerTest {
     @Test
     public void testIndex() throws Exception {
         var request = get("/api/tasks").with(token);
+        mockMvc.perform(request)
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void testIndexWithAllParams() throws Exception {
+        var key1 = testTask.getName().substring(2);
+        var key2 = testTask.getAssignee().getId();
+        var key3 = testTask.getTaskStatus().getSlug();
+        var key4 = testLabel.getId();
+
+        var request = get("/api/tasks?"
+                + "titleCont=" + key1
+                + "&assigneeId=" + key2
+                + "&status=" + key3
+                + "&labelId=" + key4).with(token);
+        mockMvc.perform(request)
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void testIndexWithParam() throws Exception {
+        var key = testTask.getTaskStatus().getSlug();
+
+        var request = get("/api/tasks?" + "&status=" + key).with(token);
         mockMvc.perform(request)
                 .andExpect(status().isOk());
     }

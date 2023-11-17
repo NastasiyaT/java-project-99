@@ -1,6 +1,5 @@
 package hexlet.code.dto.task;
 
-import hexlet.code.model.Label;
 import lombok.Getter;
 import lombok.Setter;
 

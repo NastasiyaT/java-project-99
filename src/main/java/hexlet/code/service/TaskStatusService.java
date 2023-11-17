@@ -29,7 +29,8 @@ public final class TaskStatusService {
 
     public TaskStatusDTO findById(Long id) {
         var taskStatus = taskStatusRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format("Task status with ID %s not found", id)));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        String.format("Task status with ID %s not found", id)));
         return taskStatusMapper.map(taskStatus);
     }
 
@@ -42,7 +43,8 @@ public final class TaskStatusService {
 
     public TaskStatusDTO update(TaskStatusModifyDTO data, Long id) {
         var taskStatus = taskStatusRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format("Task status with ID %s not found", id)));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        String.format("Task status with ID %s not found", id)));
         merge(taskStatus, data);
         taskStatusRepository.save(taskStatus);
         return taskStatusMapper.map(taskStatus);
@@ -50,7 +52,8 @@ public final class TaskStatusService {
 
     public void delete(Long id) {
         var taskStatus = taskStatusRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format("Task status with ID %s not found", id)));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        String.format("Task status with ID %s not found", id)));
         var tasks = taskStatus.getTasks();
 
         if (tasks.isEmpty()) {

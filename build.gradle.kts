@@ -4,6 +4,8 @@ plugins {
 	checkstyle
 	id("org.springframework.boot") version "3.1.5"
 	id("io.spring.dependency-management") version "1.1.3"
+	id("org.siouan.frontend-jdk17") version "8.0.0"
+	id ("io.sentry.jvm.gradle") version "3.14.0"
 }
 
 group = "hexlet.code"
@@ -69,4 +71,18 @@ tasks.jacocoTestReport {
 		csv.required = false
 		html.outputLocation = layout.buildDirectory.dir("jacocoHtml")
 	}
+}
+
+buildscript {
+	repositories {
+		mavenCentral()
+	}
+}
+
+sentry {
+	includeSourceContext = true
+
+	org = "anastasiya-trusova"
+	projectName = "java-spring-boot"
+	authToken = System.getenv("SENTRY_AUTH_TOKEN")
 }

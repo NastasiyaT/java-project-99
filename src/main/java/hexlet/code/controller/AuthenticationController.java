@@ -24,7 +24,7 @@ public final class AuthenticationController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.ACCEPTED)
-    String create(@RequestBody AuthRequest authRequest) {
+    public String create(@RequestBody AuthRequest authRequest) {
         var authentication = new UsernamePasswordAuthenticationToken(
                 authRequest.getUsername(), authRequest.getPassword());
         authenticationManager.authenticate(authentication);

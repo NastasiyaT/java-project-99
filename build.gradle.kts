@@ -48,7 +48,7 @@ dependencies {
 	runtimeOnly("com.h2database:h2:2.1.214")
 
 	implementation("org.springframework.boot:spring-boot-configuration-processor:3.1.2")
-		implementation("org.springframework.boot:spring-boot-starter-security:3.0.4")
+	implementation("org.springframework.boot:spring-boot-starter-security:3.0.4")
 	implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server:3.1.0")
 
 	testImplementation(platform("org.junit:junit-bom:5.10.0"))

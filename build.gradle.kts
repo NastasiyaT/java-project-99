@@ -9,7 +9,7 @@ plugins {
 	id("org.springframework.boot") version "3.1.5"
 	id("io.spring.dependency-management") version "1.1.3"
 	id("org.siouan.frontend-jdk17") version "8.0.0"
-	id ("io.sentry.jvm.gradle") version "3.14.0"
+	id("io.sentry.jvm.gradle") version "3.14.0"
 }
 
 group = "hexlet.code"

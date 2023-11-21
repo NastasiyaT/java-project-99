@@ -9,6 +9,6 @@
     "test": "echo Testing frontend"
   },
   "dependencies": {
-    "@hexlet/java-task-manager-frontend": "^1.0.17"
+    "@hexlet/java-task-manager-frontend": "^1.0.19"
   }
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import hexlet.code.model.Label;
 import hexlet.code.model.Task;
 import hexlet.code.model.TaskStatus;
+import hexlet.code.model.User;
 import hexlet.code.repository.LabelRepository;
 import hexlet.code.repository.TaskRepository;
 import hexlet.code.repository.TaskStatusRepository;
@@ -55,6 +56,8 @@ public final class TaskControllerTest {
     @Autowired
     private ObjectMapper om;
 
+    private User testUser;
+
     private TaskStatus testTaskStatus;
 
     private Task testTask;
@@ -65,15 +68,17 @@ public final class TaskControllerTest {
 
     @BeforeEach
     public void setUp() {
-        var testUser = Instancio.of(modelGenerator.getUserModel()).create();
+        testUser = Instancio.of(modelGenerator.getUserModel()).create();
         userRepository.save(testUser);
         token = jwt().jwt(builder -> builder.subject(testUser.getEmail()));
 
         testTaskStatus = Instancio.of(modelGenerator.getTaskStatusModel()).create();
+        taskStatusRepository.save(testTaskStatus);
 
         testTask = Instancio.of(modelGenerator.getTaskModel()).create();
         testTask.setAssignee(testUser);
         testTask.setTaskStatus(testTaskStatus);
+        taskRepository.save(testTask);
 
         testTaskStatus.getTasks().add(testTask);
         taskStatusRepository.save(testTaskStatus);
@@ -90,8 +95,9 @@ public final class TaskControllerTest {
 
     @AfterEach
     public void clear() {
-        taskStatusRepository.deleteAll();
+        labelRepository.deleteAll();
         taskRepository.deleteAll();
+        taskStatusRepository.deleteAll();
         userRepository.deleteAll();
     }
 

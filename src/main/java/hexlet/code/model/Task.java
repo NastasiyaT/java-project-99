@@ -58,11 +58,11 @@ public final class Task implements BaseEntity {
             joinColumns = @JoinColumn(name = "task_id"),
             inverseJoinColumns = @JoinColumn(name = "label_id")
     )
-    private Set<Label> taskLabels = new HashSet<>();
+    private Set<Label> labels = new HashSet<>();
 
     public Set<Long> getLabelIds() {
         Set<Long> ids = new HashSet<>();
-        for (Label label : taskLabels) {
+        for (Label label : labels) {
             ids.add(label.getId());
         }
         return ids;

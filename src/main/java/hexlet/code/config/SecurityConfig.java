@@ -52,6 +52,7 @@ public class SecurityConfig {
                         .requestMatchers(mvcMatcherBuilder.pattern("/api/login")).permitAll()
                         .requestMatchers(mvcMatcherBuilder.pattern("/index.html")).permitAll()
                         .requestMatchers(mvcMatcherBuilder.pattern("/assets/**")).permitAll()
+                        .requestMatchers(mvcMatcherBuilder.pattern("/api/welcome")).permitAll()
                         .requestMatchers(mvcMatcherBuilder.pattern("/api/users/**")).authenticated()
                         .requestMatchers(mvcMatcherBuilder.pattern("/api/task_statuses/**")).authenticated()
                         .requestMatchers(mvcMatcherBuilder.pattern("/api/tasks/**")).authenticated()

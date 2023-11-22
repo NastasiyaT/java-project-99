@@ -19,6 +19,6 @@ public abstract class TaskMapper {
     @Mapping(target = "status", source = "taskStatus.slug")
     @Mapping(target = "title", source = "name")
     @Mapping(target = "content", source = "description")
-    @Mapping(target = "labels", expression = "java(model.getLabelNames())")
+    @Mapping(target = "taskLabels", expression = "java(model.getLabelIds())")
     public abstract TaskDTO map(Task model);
 }

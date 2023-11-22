@@ -14,5 +14,5 @@ public class TaskModifyDTO {
     private String title;
     private String content;
     private String status;
-    private Set<String> labelNames = new HashSet<>();
+    private Set<Long> taskLabelIds = new HashSet<>();
 }

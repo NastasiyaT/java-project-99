@@ -86,7 +86,7 @@ public final class TaskControllerTest {
         testLabel = Instancio.of(modelGenerator.getLabelModel()).create();
         var label1 = Instancio.of(modelGenerator.getLabelModel()).create();
         var label2 = Instancio.of(modelGenerator.getLabelModel()).create();
-        testTask.getLabels().add(testLabel);
+        testTask.getTaskLabels().add(testLabel);
         testLabel.getTasks().add(testTask);
         labelRepository.save(testLabel);
         labelRepository.save(label1);

@@ -1,5 +1,6 @@
 package hexlet.code.dto.task;
 
+import hexlet.code.model.Label;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,5 +18,5 @@ public class TaskDTO {
     private String title;
     private String content;
     private String status;
-    private Set<String> labels = new HashSet<>();
+    private Set<Long> taskLabels = new HashSet<>();
 }

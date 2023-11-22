@@ -89,10 +89,10 @@ public final class TaskService {
             taskStatus.getTasks().add(model);
             taskStatusRepository.save(taskStatus);
         }
-        if (data.getLabelNames() != null) {
-            for (String item : data.getLabelNames()) {
-                var label = labelRepository.findByName(item).get();
-                model.getLabels().add(label);
+        if (!data.getTaskLabelIds().isEmpty()) {
+            for (Long item : data.getTaskLabelIds()) {
+                var label = labelRepository.findById(item).get();
+                model.getTaskLabels().add(label);
                 label.getTasks().add(model);
                 labelRepository.save(label);
             }

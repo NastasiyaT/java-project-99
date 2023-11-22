@@ -2,6 +2,7 @@ package hexlet.code.service;
 
 import hexlet.code.dto.task.TaskDTO;
 import hexlet.code.dto.task.TaskModifyDTO;
+import hexlet.code.dto.task.TaskParamsDTO;
 import hexlet.code.exception.ResourceNotFoundException;
 import hexlet.code.mapper.TaskMapper;
 import hexlet.code.model.Task;
@@ -9,6 +10,7 @@ import hexlet.code.repository.LabelRepository;
 import hexlet.code.repository.TaskRepository;
 import hexlet.code.repository.TaskStatusRepository;
 import hexlet.code.repository.UserRepository;
+import hexlet.code.specification.TaskSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,11 +33,14 @@ public final class TaskService {
     private TaskRepository taskRepository;
 
     @Autowired
+    private TaskSpecification taskSpecification;
+
+    @Autowired
     private LabelRepository labelRepository;
 
-    public List<TaskDTO> getAll(Map<String, String> params) {
-        var tasks = taskRepository.findAll();
-        filter(tasks, params);
+    public List<TaskDTO> getAll(TaskParamsDTO params) {
+        var spec = taskSpecification.build(params);
+        var tasks = taskRepository.findAll(spec);
         return tasks.stream()
                 .map(taskMapper::map)
                 .toList();
@@ -92,42 +97,6 @@ public final class TaskService {
                 label.getTasks().add(model);
                 labelRepository.save(label);
             }
-        }
-    }
-
-    private void filter(List<Task> items, Map<String, String> parameters) {
-        if (parameters.containsKey("titleCont")) {
-            items = items.stream()
-                    .filter(item -> {
-                        var titleCont = parameters.get("titleCont");
-                        return item.getName().contains(titleCont);
-                    })
-                    .toList();
-        }
-        if (parameters.containsKey("assigneeId")) {
-            items = items.stream()
-                    .filter(item -> {
-                        var assigneeId = Long.valueOf(parameters.get("assigneeId"));
-                        return item.getAssignee().getId().equals(assigneeId);
-                    })
-                    .toList();
-        }
-        if (parameters.containsKey("status")) {
-            items = items.stream()
-                    .filter(item -> {
-                        var status = parameters.get("status");
-                        return item.getTaskStatus().getSlug().equals(status);
-                    })
-                    .toList();
-        }
-        if (parameters.containsKey("labelId")) {
-            items = items.stream()
-                    .filter(item -> {
-                        var labelId = Long.valueOf(parameters.get("labelId"));
-                        var label = labelRepository.findById(labelId).get();
-                        return item.getLabels().contains(label);
-                    })
-                    .toList();
         }
     }
 }

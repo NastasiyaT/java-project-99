@@ -54,6 +54,7 @@ public final class TaskService {
     public TaskDTO create(TaskModifyDTO data) {
         var task = new Task();
         merge(task, data);
+        taskRepository.save(task);
         return taskMapper.map(task);
     }
 

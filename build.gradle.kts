@@ -1,14 +1,9 @@
-//import org.siouan.frontendgradleplugin.infrastructure.gradle.InstallFrontendTask
-//import kotlin.io.path.Path
-//import java.nio.file.Files
-
 plugins {
 	java
 	jacoco
 	checkstyle
 	id("org.springframework.boot") version "3.1.5"
 	id("io.spring.dependency-management") version "1.1.3"
-//	id("org.siouan.frontend-jdk17") version "8.0.0"
 	id("io.sentry.jvm.gradle") version "3.14.0"
 }
 
@@ -76,36 +71,6 @@ tasks.jacocoTestReport {
 		html.outputLocation = layout.buildDirectory.dir("jacocoHtml")
 	}
 }
-
-//frontend {
-//	nodeVersion.set("18.17.1")
-//	assembleScript.set("run build")
-//	cleanScript.set("run clean")
-//	checkScript.set("run check")
-//	verboseModeEnabled.set(true)
-//}
-//
-//tasks.named<InstallFrontendTask>("installFrontend") {
-//	val ciPlatformPresent = providers.environmentVariable("CI").isPresent()
-//	val lockFilePath = "${projectDir}/package-lock.json"
-//	val retainedMetadataFileNames: Set<String>
-//	if (ciPlatformPresent) {
-//		installScript.set("ci")
-//		retainedMetadataFileNames = setOf(lockFilePath)
-//	} else {
-//		val acceptableMetadataFileNames = listOf(lockFilePath, "${projectDir}/yarn.lock")
-//		retainedMetadataFileNames = mutableSetOf("${projectDir}/package.json")
-//		for (acceptableMetadataFileName in acceptableMetadataFileNames) {
-//			if (Files.exists(Path(acceptableMetadataFileName))) {
-//				retainedMetadataFileNames.add(acceptableMetadataFileName)
-//				break
-//			}
-//		}
-//		outputs.file(lockFilePath).withPropertyName("lockFile")
-//	}
-//	inputs.files(retainedMetadataFileNames).withPropertyName("metadataFiles")
-//	outputs.dir("${projectDir}/node_modules").withPropertyName("nodeModulesDirectory")
-//}
 
 buildscript {
 	repositories {

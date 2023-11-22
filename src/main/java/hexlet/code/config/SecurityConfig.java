@@ -22,7 +22,6 @@ import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 
 @Configuration
 @EnableWebSecurity
-@EnableWebMvc
 public class SecurityConfig {
 
     @Autowired
@@ -56,8 +55,8 @@ public class SecurityConfig {
                         .requestMatchers(mvcMatcherBuilder.pattern("/api/users/**")).authenticated()
                         .requestMatchers(mvcMatcherBuilder.pattern("/api/task_statuses/**")).authenticated()
                         .requestMatchers(mvcMatcherBuilder.pattern("/api/tasks/**")).authenticated()
-                        .requestMatchers(mvcMatcherBuilder.pattern("/api/labels/**")).authenticated())
-//                        .anyRequest().authenticated())
+                        .requestMatchers(mvcMatcherBuilder.pattern("/api/labels/**")).authenticated()
+                        .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .oauth2ResourceServer(rs -> rs.jwt(jwt -> jwt.decoder(jwtDecoder)))
                 .httpBasic(Customizer.withDefaults())

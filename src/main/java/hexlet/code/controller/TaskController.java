@@ -44,6 +44,7 @@ public final class TaskController {
         var tasks = taskService.getAll(params);
         return ResponseEntity
                 .status(HttpStatus.OK)
+                .header("X-Total-Count", String.valueOf(tasks.size()))
                 .body(tasks);
     }
 

@@ -43,6 +43,7 @@ public final class LabelController {
         var labels = labelService.getAll();
         return ResponseEntity
                 .status(HttpStatus.OK)
+                .header("X-Total-Count", String.valueOf(labels.size()))
                 .body(labels);
     }
 

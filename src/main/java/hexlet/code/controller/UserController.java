@@ -52,6 +52,7 @@ public final class UserController {
         var users = userService.getAll();
         return ResponseEntity
                 .status(HttpStatus.OK)
+                .header("X-Total-Count", String.valueOf(users.size()))
                 .body(users);
     }
 

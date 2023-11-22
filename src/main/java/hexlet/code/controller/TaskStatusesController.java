@@ -39,6 +39,7 @@ public final class TaskStatusesController {
         var taskStatuses = taskStatusService.getAll();
         return ResponseEntity
                 .status(HttpStatus.OK)
+                .header("X-Total-Count", String.valueOf(taskStatuses.size()))
                 .body(taskStatuses);
     }
 

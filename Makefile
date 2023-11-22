@@ -1,7 +1,7 @@
 setup:
 	npm install
-	./gradlew wrapper --gradle-version 8.3
-	./gradlew build
+	gradle wrapper --gradle-version 8.3
+	gradle build
 
 frontend:
 	make -C frontend start

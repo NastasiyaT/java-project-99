@@ -43,4 +43,14 @@ public final class TaskStatus implements BaseEntity {
 
     @OneToMany(mappedBy = "taskStatus", cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
     private Set<Task> tasks = new HashSet<>();
+
+    public void addTask(Task task) {
+        tasks.add(task);
+        task.setTaskStatus(this);
+    }
+
+    public void removeTask(Task task) {
+        tasks.remove(task);
+        task.setTaskStatus(null);
+    }
 }

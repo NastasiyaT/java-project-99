@@ -1,5 +1,6 @@
 package hexlet.code.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
@@ -38,6 +39,7 @@ public final class Label implements BaseEntity {
     @CreatedDate
     private LocalDate createdAt;
 
+    @JsonIgnore
     @ManyToMany(mappedBy = "labels")
     private Set<Task> tasks = new HashSet<>();
 }

@@ -67,4 +67,15 @@ public final class Task implements BaseEntity {
         }
         return ids;
     }
+
+    public void addLabel(Label label) {
+        labels.add(label);
+        label.getTasks().add(this);
+    }
+
+    public void removeLabel(Label label) {
+        labels.remove(label);
+        label.getTasks().remove(this);
+    }
 }
+

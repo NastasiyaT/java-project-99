@@ -10,7 +10,7 @@ import org.openapitools.jackson.nullable.JsonNullable;
 )
 public abstract class JsonNullableMapper {
 
-    public final  <T> JsonNullable<T> wrap(T entity) {
+    public final <T> JsonNullable<T> wrap(T entity) {
         return JsonNullable.of(entity);
     }
 

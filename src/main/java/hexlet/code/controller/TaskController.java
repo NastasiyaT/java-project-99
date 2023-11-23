@@ -1,7 +1,7 @@
 package hexlet.code.controller;
 
 import hexlet.code.dto.task.TaskDTO;
-import hexlet.code.dto.task.TaskModifyDTO;
+import hexlet.code.dto.TaskModifyDTO;
 import hexlet.code.dto.task.TaskParamsDTO;
 import hexlet.code.repository.TaskRepository;
 import hexlet.code.service.TaskService;

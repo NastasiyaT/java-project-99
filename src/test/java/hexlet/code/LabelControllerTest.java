@@ -3,9 +3,13 @@ package hexlet.code;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hexlet.code.dto.label.LabelModifyDTO;
 import hexlet.code.model.Label;
+import hexlet.code.model.User;
 import hexlet.code.repository.LabelRepository;
+import hexlet.code.repository.TaskRepository;
+import hexlet.code.repository.TaskStatusRepository;
 import hexlet.code.repository.UserRepository;
 import hexlet.code.util.ModelGenerator;
+import jakarta.servlet.ServletException;
 import org.instancio.Instancio;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,6 +24,7 @@ import java.time.LocalDate;
 import java.util.HashMap;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -39,6 +44,12 @@ public final class LabelControllerTest {
     private UserRepository userRepository;
 
     @Autowired
+    private TaskRepository taskRepository;
+
+    @Autowired
+    private TaskStatusRepository taskStatusRepository;
+
+    @Autowired
     private LabelRepository labelRepository;
 
     @Autowired
@@ -47,13 +58,15 @@ public final class LabelControllerTest {
     @Autowired
     private ObjectMapper om;
 
+    private User testUser;
+
     private Label testLabel;
 
     private JwtRequestPostProcessor token;
 
     @BeforeEach
     public void setUp() {
-        var testUser = Instancio.of(modelGenerator.getUserModel()).create();
+        testUser = Instancio.of(modelGenerator.getUserModel()).create();
         userRepository.save(testUser);
         token = jwt().jwt(builder -> builder.subject(testUser.getEmail()));
 
@@ -63,8 +76,10 @@ public final class LabelControllerTest {
 
     @AfterEach
     public void clear() {
-        userRepository.deleteAll();
+        taskRepository.deleteAll();
         labelRepository.deleteAll();
+        taskStatusRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
     @Test
@@ -109,6 +124,7 @@ public final class LabelControllerTest {
                 .andExpect(status().isCreated());
 
         var label = labelRepository.findByName(labelCreateDTO.getName()).get();
+        assertThat(label.getId()).isNotNull();
         assertThat(label.getCreatedAt()).isBeforeOrEqualTo(LocalDate.now());
     }
 
@@ -163,5 +179,24 @@ public final class LabelControllerTest {
         var request = delete("/api/labels/" + labelId).with(token);
         mockMvc.perform(request)
                 .andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void testDeleteFail() throws Exception {
+        var taskStatus = Instancio.of(modelGenerator.getTaskStatusModel()).create();
+        taskStatusRepository.save(taskStatus);
+
+        var task = Instancio.of(modelGenerator.getTaskModel()).create();
+        task.setAssignee(testUser);
+        task.addLabel(testLabel);
+        taskStatus.addTask(task);
+        labelRepository.save(testLabel);
+        taskStatusRepository.save(taskStatus);
+
+        var labelId = testLabel.getId();
+        var request = delete("/api/labels/" + labelId).with(token);
+        var exception = assertThrows(ServletException.class,
+                () -> mockMvc.perform(request));
+        assertThat(exception.getMessage()).contains("Label has active tasks");
     }
 }

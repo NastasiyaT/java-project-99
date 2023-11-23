@@ -2,9 +2,9 @@ package hexlet.code.service;
 
 import hexlet.code.dto.label.LabelModifyDTO;
 import hexlet.code.dto.label.LabelDTO;
+import hexlet.code.exception.ConstraintViolationException;
 import hexlet.code.exception.ResourceNotFoundException;
 import hexlet.code.mapper.LabelMapper;
-import hexlet.code.model.Label;
 import hexlet.code.repository.LabelRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,8 +34,7 @@ public final class LabelService {
     }
 
     public LabelDTO create(LabelModifyDTO data) {
-        var label = new Label();
-        merge(label, data);
+        var label = labelMapper.map(data);
         labelRepository.save(label);
         return labelMapper.map(label);
     }
@@ -43,7 +42,7 @@ public final class LabelService {
     public LabelDTO update(LabelModifyDTO data, Long id) {
         var label = labelRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format("Label with ID %s not found", id)));
-        merge(label, data);
+        labelMapper.update(data, label);
         labelRepository.save(label);
         return labelMapper.map(label);
     }
@@ -53,12 +52,8 @@ public final class LabelService {
                 .orElseThrow(() -> new ResourceNotFoundException(String.format("Label with ID %s not found", id)));
         if (label.getTasks().isEmpty()) {
             labelRepository.deleteById(id);
-        }
-    }
-
-    private void merge(Label model, LabelModifyDTO data) {
-        if (data.getName() != null) {
-            model.setName(data.getName());
+        } else {
+            throw new ConstraintViolationException("Label has active tasks");
         }
     }
 }

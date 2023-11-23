@@ -1,7 +1,7 @@
 package hexlet.code.util;
 
 import hexlet.code.dto.label.LabelModifyDTO;
-import hexlet.code.dto.task.TaskModifyDTO;
+import hexlet.code.dto.TaskModifyDTO;
 import hexlet.code.dto.task_status.TaskStatusModifyDTO;
 import hexlet.code.dto.user.UserModifyDTO;
 import hexlet.code.model.Label;

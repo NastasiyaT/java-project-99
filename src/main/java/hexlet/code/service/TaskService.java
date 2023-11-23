@@ -54,7 +54,6 @@ public final class TaskService {
 
     public TaskDTO create(TaskModifyDTO data) {
         var task = taskMapper.map(data);
-        task.setAssignee(null);
         modify(task, data);
         taskRepository.save(task);
         return taskMapper.map(task);

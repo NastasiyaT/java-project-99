@@ -2,8 +2,11 @@ package hexlet.code;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hexlet.code.model.User;
+import hexlet.code.repository.TaskRepository;
+import hexlet.code.repository.TaskStatusRepository;
 import hexlet.code.repository.UserRepository;
 import hexlet.code.util.ModelGenerator;
+import jakarta.servlet.ServletException;
 import org.instancio.Instancio;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,6 +20,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.HashMap;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -34,6 +38,12 @@ public final class UserControllerTest {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private TaskStatusRepository taskStatusRepository;
+
+    @Autowired
+    private TaskRepository taskRepository;
 
     @Autowired
     private ModelGenerator modelGenerator;
@@ -54,8 +64,9 @@ public final class UserControllerTest {
 
     @AfterEach
     public void clear() {
-        userRepository.deleteAll();
-    }
+        taskRepository.deleteAll();
+        taskStatusRepository.deleteAll();
+        userRepository.deleteAll();    }
 
     @Test
     public void testShow() throws Exception {
@@ -146,5 +157,24 @@ public final class UserControllerTest {
         var request = delete("/api/users/" + userId).with(token);
         mockMvc.perform(request)
                 .andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void testDeleteFail() throws Exception {
+        var userId = testUser.getId();
+
+        var taskStatus = Instancio.of(modelGenerator.getTaskStatusModel()).create();
+        var task = Instancio.of(modelGenerator.getTaskModel()).create();
+        task.setTaskStatus(taskStatus);
+        taskStatus.addTask(task);
+        taskStatusRepository.save(taskStatus);
+
+        testUser.addTask(task);
+        userRepository.save(testUser);
+
+        var request = delete("/api/users/" + userId).with(token);
+        var exception = assertThrows(ServletException.class,
+                () -> mockMvc.perform(request));
+        assertThat(exception.getMessage()).contains("User has active tasks");
     }
 }

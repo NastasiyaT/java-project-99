@@ -45,8 +45,9 @@ public final class UserService implements UserDetailsManager {
     }
 
     public UserDTO create(UserModifyDTO data) {
-        var user = new User();
-        merge(user, data);
+        var user = userMapper.map(data);
+        var passwordDigest = passwordEncoder.encode(data.getPassword());
+        user.setPasswordDigest(passwordDigest);
         userRepository.save(user);
         return userMapper.map(user);
     }
@@ -54,7 +55,13 @@ public final class UserService implements UserDetailsManager {
     public UserDTO update(UserModifyDTO data, Long id) {
         var user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format("User with ID %s not found", id)));
-        merge(user, data);
+        userMapper.update(data, user);
+
+        if (data.getPassword() != null) {
+            var passwordDigest = passwordEncoder.encode(data.getPassword());
+            user.setPasswordDigest(passwordDigest);
+        }
+
         userRepository.save(user);
         return userMapper.map(user);
     }
@@ -66,6 +73,8 @@ public final class UserService implements UserDetailsManager {
 
         if (tasks.isEmpty()) {
             userRepository.deleteById(id);
+        } else {
+            throw new RuntimeException("User has active tasks");
         }
     }
 
@@ -102,21 +111,5 @@ public final class UserService implements UserDetailsManager {
     @Override
     public boolean userExists(String username) {
         throw new UnsupportedOperationException("Unimplemented method 'userExists'");
-    }
-
-    private void merge(User model, UserModifyDTO data) {
-        if (data.getFirstName() != null) {
-            model.setFirstName(data.getFirstName());
-        }
-        if (data.getLastName() != null) {
-            model.setLastName(data.getLastName());
-        }
-        if (data.getEmail() != null) {
-            model.setEmail(data.getEmail());
-        }
-        if (data.getPassword() != null) {
-            var passwordDigest = passwordEncoder.encode(data.getPassword());
-            model.setPasswordDigest(passwordDigest);
-        }
     }
 }

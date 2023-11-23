@@ -95,8 +95,8 @@ public final class TaskControllerTest {
 
     @AfterEach
     public void clear() {
-        labelRepository.deleteAll();
         taskRepository.deleteAll();
+        labelRepository.deleteAll();
         taskStatusRepository.deleteAll();
         userRepository.deleteAll();
     }
@@ -144,7 +144,7 @@ public final class TaskControllerTest {
     public void testIndexWithParam() throws Exception {
         var key = testTask.getTaskStatus().getSlug();
 
-        var request = get("/api/tasks?" + "&status=" + key).with(token);
+        var request = get("/api/tasks?" + "status=" + key).with(token);
         mockMvc.perform(request)
                 .andExpect(status().isOk());
     }

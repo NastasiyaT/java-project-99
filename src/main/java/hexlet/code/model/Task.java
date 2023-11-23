@@ -1,5 +1,6 @@
 package hexlet.code.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.FetchType;
@@ -38,8 +39,7 @@ public final class Task implements BaseEntity {
     @CreatedDate
     private LocalDate createdAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @ManyToOne
     private User assignee;
 
     @NotBlank
@@ -52,6 +52,7 @@ public final class Task implements BaseEntity {
     @JoinColumn(name = "task_status_id")
     private TaskStatus taskStatus;
 
+    @JsonIgnore
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "task_labels",
@@ -59,14 +60,6 @@ public final class Task implements BaseEntity {
             inverseJoinColumns = @JoinColumn(name = "label_id")
     )
     private Set<Label> labels = new HashSet<>();
-
-    public Set<Long> getLabelIds() {
-        Set<Long> ids = new HashSet<>();
-        for (Label label : labels) {
-            ids.add(label.getId());
-        }
-        return ids;
-    }
 
     public void addLabel(Label label) {
         labels.add(label);

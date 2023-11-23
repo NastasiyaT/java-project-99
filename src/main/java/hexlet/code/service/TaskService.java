@@ -1,10 +1,11 @@
 package hexlet.code.service;
 
+import hexlet.code.dto.TaskParamsDTO;
 import hexlet.code.dto.task.TaskDTO;
-import hexlet.code.dto.TaskModifyDTO;
-import hexlet.code.dto.task.TaskParamsDTO;
+import hexlet.code.dto.task.TaskModifyDTO;
 import hexlet.code.exception.ResourceNotFoundException;
 import hexlet.code.mapper.TaskMapper;
+import hexlet.code.model.Label;
 import hexlet.code.model.Task;
 import hexlet.code.repository.LabelRepository;
 import hexlet.code.repository.TaskRepository;
@@ -52,8 +53,9 @@ public final class TaskService {
     }
 
     public TaskDTO create(TaskModifyDTO data) {
-        var task = new Task();
-        merge(task, data);
+        var task = taskMapper.map(data);
+        task.setAssignee(null);
+        modify(task, data);
         taskRepository.save(task);
         return taskMapper.map(task);
     }
@@ -61,42 +63,53 @@ public final class TaskService {
     public TaskDTO update(TaskModifyDTO data, Long id) {
         var task = taskRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format("Task with ID %s not found", id)));
-        merge(task, data);
+        taskMapper.update(data, task);
+        modify(task, data);
         taskRepository.save(task);
         return taskMapper.map(task);
     }
 
     public void delete(Long id) {
+        var task = taskRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("Task with ID %s not found", id)));
+
+        if (!task.getLabels().isEmpty()) {
+            for (Label item : task.getLabels()) {
+                task.removeLabel(item);
+                labelRepository.save(item);
+            }
+        }
+
+        var taskStatus = task.getTaskStatus();
+        taskStatus.removeTask(task);
+        taskStatusRepository.save(taskStatus);
+
+        var assignee = task.getAssignee();
+        assignee.removeTask(task);
+        userRepository.save(assignee);
+
         taskRepository.deleteById(id);
     }
 
-    private void merge(Task model, TaskModifyDTO data) {
-        if (data.getIndex() != null) {
-            model.setIndex(data.getIndex());
-        }
+    private void modify(Task task, TaskModifyDTO data) {
+
         if (data.getAssigneeId() != null) {
             var assignee = userRepository.findById(data.getAssigneeId()).get();
-            model.setAssignee(assignee);
+            assignee.addTask(task);
+            userRepository.save(assignee);
         }
-        if (data.getTitle() != null) {
-            model.setName(data.getTitle());
-        }
-        if (data.getContent() != null) {
-            model.setDescription(data.getContent());
-        }
-        if (data.getStatus() != null) {
-            var taskStatus = taskStatusRepository.findBySlug(data.getStatus()).get();
-            model.setTaskStatus(taskStatus);
-            taskStatus.getTasks().add(model);
-            taskStatusRepository.save(taskStatus);
-        }
+
         if (!data.getTaskLabelIds().isEmpty()) {
-            for (Long item : data.getTaskLabelIds()) {
-                var label = labelRepository.findById(item).get();
-                model.getLabels().add(label);
-                label.getTasks().add(model);
+            for (Label label : task.getLabels()) {
+                task.addLabel(label);
                 labelRepository.save(label);
             }
+        }
+
+        if (data.getStatus() != null) {
+            var taskStatus = taskStatusRepository.findBySlug(data.getStatus()).get();
+            taskStatus.addTask(task);
+            taskStatusRepository.save(taskStatus);
         }
     }
 }

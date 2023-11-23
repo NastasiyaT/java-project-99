@@ -1,5 +1,6 @@
 package hexlet.code.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -23,7 +24,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -45,6 +48,7 @@ public final class User implements UserDetails, BaseEntity {
     @Column(unique = true)
     private String email;
 
+    @JsonIgnore
     @NotBlank
     @Size(min = 3)
     private String passwordDigest;
@@ -56,7 +60,17 @@ public final class User implements UserDetails, BaseEntity {
     private LocalDate updatedAt;
 
     @OneToMany(mappedBy = "assignee", cascade = CascadeType.MERGE, orphanRemoval = true)
-    private List<Task> tasks = new ArrayList<>();
+    private Set<Task> tasks = new HashSet<>();
+
+    public void addTask(Task task) {
+        tasks.add(task);
+        task.setAssignee(this);
+    }
+
+    public void removeTask(Task task) {
+        tasks.remove(task);
+        task.setAssignee(null);
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

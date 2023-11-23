@@ -2,7 +2,6 @@ package hexlet.code.service;
 
 import hexlet.code.dto.label.LabelModifyDTO;
 import hexlet.code.dto.label.LabelDTO;
-import hexlet.code.exception.ConstraintViolationException;
 import hexlet.code.exception.ResourceNotFoundException;
 import hexlet.code.mapper.LabelMapper;
 import hexlet.code.repository.LabelRepository;
@@ -53,7 +52,7 @@ public final class LabelService {
         if (label.getTasks().isEmpty()) {
             labelRepository.deleteById(id);
         } else {
-            throw new ConstraintViolationException("Label has active tasks");
+            throw new RuntimeException("Label has active tasks");
         }
     }
 }

@@ -1,5 +1,6 @@
 package hexlet.code.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -41,16 +42,12 @@ public final class TaskStatus implements BaseEntity {
     @CreatedDate
     private LocalDate createdAt;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "taskStatus", cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
     private Set<Task> tasks = new HashSet<>();
 
     public void addTask(Task task) {
         tasks.add(task);
         task.setTaskStatus(this);
-    }
-
-    public void removeTask(Task task) {
-        tasks.remove(task);
-        task.setTaskStatus(null);
     }
 }

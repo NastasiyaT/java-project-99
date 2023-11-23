@@ -54,6 +54,11 @@ public final class TaskService {
 
     public TaskDTO create(TaskModifyDTO data) {
         var task = taskMapper.map(data);
+
+        if (data.getContent() == null) {
+            task.setDescription("No description provided");
+        }
+
         modify(task, data);
         taskRepository.save(task);
         return taskMapper.map(task);
@@ -83,9 +88,11 @@ public final class TaskService {
         taskStatus.removeTask(task);
         taskStatusRepository.save(taskStatus);
 
-        var assignee = task.getAssignee();
-        assignee.removeTask(task);
-        userRepository.save(assignee);
+        if (task.getAssignee() != null) {
+            var assignee = task.getAssignee();
+            assignee.removeTask(task);
+            userRepository.save(assignee);
+        }
 
         taskRepository.deleteById(id);
     }

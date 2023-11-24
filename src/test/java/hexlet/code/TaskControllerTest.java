@@ -168,7 +168,7 @@ public final class TaskControllerTest {
         mockMvc.perform(request)
                 .andExpect(status().isCreated());
 
-        var task = taskRepository.findFirstByNameOrderByIdDesc(taskCreateDTO.getTitle()).get();
+        var task = taskRepository.findByName(taskCreateDTO.getTitle()).get();
         assertThat(task.getName()).isEqualTo(taskCreateDTO.getTitle());
     }
 

@@ -44,14 +44,12 @@ public final class Task implements BaseEntity {
     private User assignee;
 
     @NotBlank
-    @Column(unique = true)
     private String name;
 
     private String description;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "task_status_id")
+    @ManyToOne
     private TaskStatus taskStatus;
 
     @JsonIgnore

@@ -44,7 +44,6 @@ public final class Task implements BaseEntity {
     private User assignee;
 
     @NotBlank
-    @Column(unique = true)
     private String name;
 
     private String description;

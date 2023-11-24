@@ -10,4 +10,5 @@ import java.util.Optional;
 @Repository
 public interface TaskRepository extends JpaRepository<Task, Long>, JpaSpecificationExecutor<Task> {
     Optional<Task> findFirstByNameOrderByIdDesc(String name);
+    Optional<Task> findByName(String name);
 }

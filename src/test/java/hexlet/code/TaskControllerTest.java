@@ -158,7 +158,6 @@ public final class TaskControllerTest {
 
     @Test
     public void testCreate() throws Exception {
-        var tasks1 = taskRepository.findAll().size();
         var taskCreateDTO = Instancio.of(modelGenerator.getTaskModifyDTOModel()).create();
         taskCreateDTO.setStatus(testTaskStatus.getSlug());
 
@@ -169,8 +168,8 @@ public final class TaskControllerTest {
         mockMvc.perform(request)
                 .andExpect(status().isCreated());
 
-        var tasks2 = taskRepository.findAll().size();
-        assertThat(tasks2).isGreaterThan(tasks1);
+        var task = taskRepository.findFirstByNameOrderByIdDesc(taskCreateDTO.getTitle()).get();
+        assertThat(task.getName()).isEqualTo(taskCreateDTO.getTitle());
     }
 
     @Test

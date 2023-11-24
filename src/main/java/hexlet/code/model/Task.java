@@ -1,7 +1,6 @@
 package hexlet.code.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.FetchType;
@@ -44,7 +43,6 @@ public final class Task implements BaseEntity {
     private User assignee;
 
     @NotBlank
-    @Column(unique = true)
     private String name;
 
     private String description;

@@ -47,7 +47,6 @@ public final class User implements UserDetails, BaseEntity {
     @Column(unique = true)
     private String email;
 
-    @JsonIgnore
     @NotBlank
     @Size(min = 3)
     private String passwordDigest;
@@ -58,7 +57,7 @@ public final class User implements UserDetails, BaseEntity {
     @LastModifiedDate
     private LocalDate updatedAt;
 
-    @OneToMany(mappedBy = "assignee", cascade = CascadeType.MERGE, orphanRemoval = true)
+    @OneToMany(mappedBy = "assignee", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Task> tasks = new HashSet<>();
 
     public void addTask(Task task) {

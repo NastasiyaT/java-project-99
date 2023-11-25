@@ -39,7 +39,6 @@ public final class Label implements BaseEntity {
     @CreatedDate
     private LocalDate createdAt;
 
-    @JsonIgnore
     @ManyToMany(mappedBy = "labels")
     private Set<Task> tasks = new HashSet<>();
 }

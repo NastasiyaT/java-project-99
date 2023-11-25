@@ -53,11 +53,17 @@ public final class TaskService {
     }
 
     public TaskDTO create(TaskModifyDTO data) {
-        var task = taskMapper.map(data);
+        var newTask = taskMapper.map(data);
 
         if (data.getContent() == null) {
-            task.setDescription("No description provided");
+            newTask.setDescription("No description provided");
         }
+
+        var taskStatus = taskStatusRepository.findBySlug(data.getStatus()).get();
+        taskStatus.addTask(newTask);
+        taskStatusRepository.save(taskStatus);
+
+        var task = taskRepository.findByName(data.getTitle()).get();
 
         modify(task, data);
         taskRepository.save(task);
@@ -68,6 +74,13 @@ public final class TaskService {
         var task = taskRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format("Task with ID %s not found", id)));
         taskMapper.update(data, task);
+
+        if (data.getStatus() != null) {
+            var taskStatus = taskStatusRepository.findBySlug(data.getStatus()).get();
+            taskStatus.addTask(task);
+            taskStatusRepository.save(taskStatus);
+        }
+
         modify(task, data);
         taskRepository.save(task);
         return taskMapper.map(task);
@@ -84,15 +97,15 @@ public final class TaskService {
             }
         }
 
-        var taskStatus = task.getTaskStatus();
-        taskStatus.removeTask(task);
-        taskStatusRepository.save(taskStatus);
-
         if (task.getAssignee() != null) {
             var assignee = task.getAssignee();
             assignee.removeTask(task);
             userRepository.save(assignee);
         }
+
+        var taskStatus = task.getTaskStatus();
+        taskStatus.removeTask(task);
+        taskStatusRepository.save(taskStatus);
 
         taskRepository.deleteById(id);
     }
@@ -110,12 +123,6 @@ public final class TaskService {
                 task.addLabel(label);
                 labelRepository.save(label);
             }
-        }
-
-        if (data.getStatus() != null) {
-            var taskStatus = taskStatusRepository.findBySlug(data.getStatus()).get();
-            taskStatus.addTask(task);
-            taskStatusRepository.save(taskStatus);
         }
     }
 }

@@ -62,7 +62,6 @@ public final class TaskService {
         task.setAssignee(assignee);
         if (assignee != null) {
             assignee.getTasks().add(task);
-//            userRepository.save(assignee);
         }
 
         var taskStatus = taskStatusRepository.findBySlug(data.getStatus()).get();
@@ -85,6 +84,12 @@ public final class TaskService {
                 .orElseThrow(() -> new ResourceNotFoundException(String.format("Task with ID %s not found", id)));
         taskMapper.update(data, task);
 
+        var assignee = data.getAssigneeId() == null ? null : userRepository.findById(data.getAssigneeId()).get();
+        task.setAssignee(assignee);
+        if (assignee != null) {
+            assignee.getTasks().add(task);
+        }
+
         if (data.getStatus() != null) {
             var taskStatus = taskStatusRepository.findBySlug(data.getStatus()).get();
             task.setTaskStatus(taskStatus);
@@ -101,7 +106,7 @@ public final class TaskService {
 
         taskRepository.save(task);
 
-        return taskMapper.map(taskRepository.findByName(data.getTitle()).get());
+        return taskMapper.map(task);
     }
 
     public void delete(Long id) {

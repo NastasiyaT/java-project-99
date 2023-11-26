@@ -77,7 +77,7 @@ public final class TaskService {
             }
         }
 
-        return taskMapper.map(task);
+        return taskMapper.map(taskRepository.findByName(data.getTitle()).get());
     }
 
     public TaskDTO update(TaskModifyDTO data, Long id) {
@@ -101,7 +101,7 @@ public final class TaskService {
 
         taskRepository.save(task);
 
-        return taskMapper.map(task);
+        return taskMapper.map(taskRepository.findByName(data.getTitle()).get());
     }
 
     public void delete(Long id) {

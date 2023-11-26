@@ -6,7 +6,6 @@ import hexlet.code.dto.task.TaskModifyDTO;
 import hexlet.code.exception.ResourceNotFoundException;
 import hexlet.code.mapper.TaskMapper;
 import hexlet.code.model.Label;
-import hexlet.code.model.Task;
 import hexlet.code.repository.LabelRepository;
 import hexlet.code.repository.TaskRepository;
 import hexlet.code.repository.TaskStatusRepository;
@@ -53,20 +52,31 @@ public final class TaskService {
     }
 
     public TaskDTO create(TaskModifyDTO data) {
-        var newTask = taskMapper.map(data);
+        var task = taskMapper.map(data);
 
         if (data.getContent() == null) {
-            newTask.setDescription("No description provided");
+            task.setDescription("No description provided");
+        }
+
+        var assignee = data.getAssigneeId() == null ? null : userRepository.findById(data.getAssigneeId()).get();
+        task.setAssignee(assignee);
+        if (assignee != null) {
+            assignee.getTasks().add(task);
+//            userRepository.save(assignee);
         }
 
         var taskStatus = taskStatusRepository.findBySlug(data.getStatus()).get();
-        taskStatus.addTask(newTask);
+        task.setTaskStatus(taskStatus);
+        taskStatus.getTasks().add(task);
         taskStatusRepository.save(taskStatus);
 
-        var task = taskRepository.findByName(data.getTitle()).get();
+        if (!data.getTaskLabelIds().isEmpty()) {
+            for (Label label : task.getLabels()) {
+                task.addLabel(label);
+                labelRepository.save(label);
+            }
+        }
 
-        modify(task, data);
-        taskRepository.save(task);
         return taskMapper.map(task);
     }
 
@@ -77,12 +87,20 @@ public final class TaskService {
 
         if (data.getStatus() != null) {
             var taskStatus = taskStatusRepository.findBySlug(data.getStatus()).get();
-            taskStatus.addTask(task);
+            task.setTaskStatus(taskStatus);
+            taskStatus.getTasks().add(task);
             taskStatusRepository.save(taskStatus);
         }
 
-        modify(task, data);
+        if (!data.getTaskLabelIds().isEmpty()) {
+            for (Label label : task.getLabels()) {
+                task.addLabel(label);
+                labelRepository.save(label);
+            }
+        }
+
         taskRepository.save(task);
+
         return taskMapper.map(task);
     }
 
@@ -99,30 +117,14 @@ public final class TaskService {
 
         if (task.getAssignee() != null) {
             var assignee = task.getAssignee();
-            assignee.removeTask(task);
+            assignee.getTasks().remove(task);
             userRepository.save(assignee);
         }
 
         var taskStatus = task.getTaskStatus();
-        taskStatus.removeTask(task);
+        taskStatus.getTasks().remove(task);
         taskStatusRepository.save(taskStatus);
 
         taskRepository.deleteById(id);
-    }
-
-    private void modify(Task task, TaskModifyDTO data) {
-
-        if (data.getAssigneeId() != null) {
-            var assignee = userRepository.findById(data.getAssigneeId()).get();
-            assignee.addTask(task);
-            userRepository.save(assignee);
-        }
-
-        if (!data.getTaskLabelIds().isEmpty()) {
-            for (Label label : task.getLabels()) {
-                task.addLabel(label);
-                labelRepository.save(label);
-            }
-        }
     }
 }

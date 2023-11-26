@@ -179,7 +179,8 @@ public final class TaskStatusControllerTest {
     public void testDeleteFail() throws Exception {
         var task = Instancio.of(modelGenerator.getTaskModel()).create();
         task.setAssignee(testUser);
-        testTaskStatus.addTask(task);
+        task.setTaskStatus(testTaskStatus);
+        testTaskStatus.getTasks().add(task);
         taskStatusRepository.save(testTaskStatus);
 
         var taskStatusId = testTaskStatus.getId();

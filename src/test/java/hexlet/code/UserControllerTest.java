@@ -166,10 +166,11 @@ public final class UserControllerTest {
         var taskStatus = Instancio.of(modelGenerator.getTaskStatusModel()).create();
         var task = Instancio.of(modelGenerator.getTaskModel()).create();
         task.setTaskStatus(taskStatus);
-        taskStatus.addTask(task);
+        taskStatus.getTasks().add(task);
         taskStatusRepository.save(taskStatus);
 
-        testUser.addTask(task);
+        task.setAssignee(testUser);
+        testUser.getTasks().add(task);
         userRepository.save(testUser);
 
         var request = delete("/api/users/" + userId).with(token);

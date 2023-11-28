@@ -19,6 +19,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "tasks")
@@ -60,6 +61,12 @@ public final class Task implements BaseEntity {
     public void removeLabel(Label label) {
         labels.remove(label);
         label.getTasks().remove(this);
+    }
+
+    public Set<Long> getLabelIds() {
+        return labels.stream()
+                .map(Label::getId)
+                .collect(Collectors.toSet());
     }
 }
 

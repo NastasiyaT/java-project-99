@@ -102,10 +102,12 @@ public final class TaskService {
             userRepository.save(assignee);
         }
 
-        var taskStatus = taskStatusRepository.findBySlug(data.getStatus()).get();
-        task.setTaskStatus(taskStatus);
-        taskStatus.getTasks().add(task);
-        taskStatusRepository.save(taskStatus);
+        if (data.getStatus() != null) {
+            var taskStatus = taskStatusRepository.findBySlug(data.getStatus()).get();
+            task.setTaskStatus(taskStatus);
+            taskStatus.getTasks().add(task);
+            taskStatusRepository.save(taskStatus);
+        }
 
         if (!data.getTaskLabelIds().isEmpty()) {
             for (Label label : task.getLabels()) {

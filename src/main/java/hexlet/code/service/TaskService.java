@@ -67,6 +67,7 @@ public final class TaskService {
                 .orElseThrow(EntityNotFoundException::new);
         taskMapper.update(data, task);
         modify(task, data);
+        taskRepository.save(task);
         return taskMapper.map(task);
     }
 
@@ -115,7 +116,5 @@ public final class TaskService {
                 labelRepository.save(label);
             }
         }
-
-        taskRepository.save(task);
     }
 }

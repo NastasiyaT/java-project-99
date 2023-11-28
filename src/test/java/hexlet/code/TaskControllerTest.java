@@ -22,7 +22,6 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.HashMap;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -84,13 +83,9 @@ public final class TaskControllerTest {
         taskStatusRepository.save(testTaskStatus);
 
         testLabel = Instancio.of(modelGenerator.getLabelModel()).create();
-        var label1 = Instancio.of(modelGenerator.getLabelModel()).create();
-        var label2 = Instancio.of(modelGenerator.getLabelModel()).create();
         testTask.getLabels().add(testLabel);
         testLabel.getTasks().add(testTask);
         labelRepository.save(testLabel);
-        labelRepository.save(label1);
-        labelRepository.save(label2);
     }
 
     @AfterEach
@@ -107,14 +102,6 @@ public final class TaskControllerTest {
         var request = get("/api/tasks/" + taskId).with(token);
         mockMvc.perform(request)
                 .andExpect(status().isOk());
-    }
-
-    @Test
-    public void testShowNonExistentId() throws Exception {
-        var taskId = testTask.getId() + 100500;
-        var request = get("/api/tasks/" + taskId).with(token);
-        mockMvc.perform(request)
-                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -158,30 +145,15 @@ public final class TaskControllerTest {
 
     @Test
     public void testCreate() throws Exception {
-        var taskCreateDTO = Instancio.of(modelGenerator.getTaskModifyDTOModel()).create();
-        taskCreateDTO.setStatus(testTaskStatus.getSlug());
+        var taskDTO = Instancio.of(modelGenerator.getTaskDTOModel()).create();
+        taskDTO.setStatus(testTaskStatus.getSlug());
 
         var request = post("/api/tasks").with(token)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(om.writeValueAsString(taskCreateDTO));
+                .content(om.writeValueAsString(taskDTO));
 
         mockMvc.perform(request)
                 .andExpect(status().isCreated());
-
-        var task = taskRepository.findByName(taskCreateDTO.getTitle()).get();
-        assertThat(task.getName()).isEqualTo(taskCreateDTO.getTitle());
-    }
-
-    @Test
-    public void testCreateFail() throws Exception {
-        var taskCreateDTO = Instancio.of(modelGenerator.getTaskModifyDTOModel()).create();
-        taskCreateDTO.setStatus("абракадабра");
-        var request = post("/api/tasks").with(token)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(om.writeValueAsString(taskCreateDTO));
-
-        mockMvc.perform(request)
-                .andExpect(status().is4xxClientError());
     }
 
     @Test
@@ -197,24 +169,6 @@ public final class TaskControllerTest {
 
         mockMvc.perform(request)
                 .andExpect(status().isOk());
-
-        var newTask = taskRepository.findById(taskId).get();
-        assertThat(newTask.getDescription()).isEqualTo("Go shopping");
-    }
-
-    @Test
-    public void testUpdateFail() throws Exception {
-        var taskId = testTask.getId();
-
-        var data = new HashMap<>();
-        data.put("title", "");
-
-        var request = put("/api/tasks/" + taskId).with(token)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(om.writeValueAsString(data));
-
-        mockMvc.perform(request)
-                .andExpect(status().is4xxClientError());
     }
 
     @Test

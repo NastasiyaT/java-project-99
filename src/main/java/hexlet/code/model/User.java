@@ -56,7 +56,7 @@ public final class User implements UserDetails, BaseEntity {
     @LastModifiedDate
     private LocalDate updatedAt;
 
-    @OneToMany(mappedBy = "assignee", cascade = CascadeType.MERGE, orphanRemoval = true)
+    @OneToMany(mappedBy = "assignee", cascade = CascadeType.MERGE)
     private Set<Task> tasks = new HashSet<>();
 
     @Override

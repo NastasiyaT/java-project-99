@@ -1,7 +1,6 @@
 package hexlet.code.controller;
 
-import hexlet.code.dto.task_status.TaskStatusModifyDTO;
-import hexlet.code.dto.task_status.TaskStatusDTO;
+import hexlet.code.dto.TaskStatusDTO;
 import hexlet.code.service.TaskStatusService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,14 +25,6 @@ public final class TaskStatusesController {
     @Autowired
     private TaskStatusService taskStatusService;
 
-    @GetMapping(path = "/{id}")
-    public ResponseEntity<TaskStatusDTO> show(@PathVariable Long id) {
-        var taskStatus = taskStatusService.findById(id);
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(taskStatus);
-    }
-
     @GetMapping(path = "")
     public ResponseEntity<List<TaskStatusDTO>> index() {
         var taskStatuses = taskStatusService.getAll();
@@ -43,32 +34,22 @@ public final class TaskStatusesController {
                 .body(taskStatuses);
     }
 
+    @GetMapping(path = "/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public TaskStatusDTO show(@PathVariable Long id) {
+        return taskStatusService.findById(id);
+    }
+
     @PostMapping(path = "")
-    public ResponseEntity<TaskStatusDTO> create(@Valid @RequestBody TaskStatusModifyDTO data) {
-        try {
-            var taskStatus = taskStatusService.create(data);
-            return ResponseEntity
-                    .status(HttpStatus.CREATED)
-                    .body(taskStatus);
-        } catch (Exception e) {
-            return ResponseEntity
-                    .status(HttpStatus.FORBIDDEN)
-                    .build();
-        }
+    @ResponseStatus(HttpStatus.CREATED)
+    public TaskStatusDTO create(@Valid @RequestBody TaskStatusDTO data) {
+        return taskStatusService.create(data);
     }
 
     @PutMapping(path = "/{id}")
-    public ResponseEntity<TaskStatusDTO> update(@Valid @RequestBody TaskStatusModifyDTO data, @PathVariable Long id) {
-        try {
-            var taskStatus = taskStatusService.update(data, id);
-            return ResponseEntity
-                    .status(HttpStatus.OK)
-                    .body(taskStatus);
-        } catch (Exception e) {
-            return ResponseEntity
-                    .status(HttpStatus.FORBIDDEN)
-                    .build();
-        }
+    @ResponseStatus(HttpStatus.OK)
+    public TaskStatusDTO update(@Valid @RequestBody TaskStatusDTO data, @PathVariable Long id) {
+        return taskStatusService.update(data, id);
     }
 
     @DeleteMapping(path = "/{id}")

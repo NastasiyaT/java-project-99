@@ -1,12 +1,11 @@
 package hexlet.code.service;
 
-import hexlet.code.dto.user.UserModifyDTO;
-import hexlet.code.dto.user.UserDTO;
-import hexlet.code.exception.ResourceNotFoundException;
+import hexlet.code.dto.UserDTO;
 import hexlet.code.mapper.UserMapper;
 import hexlet.code.model.User;
 import hexlet.code.repository.UserRepository;
 import hexlet.code.util.UserUtils;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -40,11 +39,11 @@ public final class UserService implements UserDetailsManager {
 
     public UserDTO findById(Long id) {
         var user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format("User with ID %s not found", id)));
+                .orElseThrow(EntityNotFoundException::new);
         return userMapper.map(user);
     }
 
-    public UserDTO create(UserModifyDTO data) {
+    public UserDTO create(UserDTO data) {
         var user = userMapper.map(data);
         var passwordDigest = passwordEncoder.encode(data.getPassword());
         user.setPasswordDigest(passwordDigest);
@@ -52,9 +51,9 @@ public final class UserService implements UserDetailsManager {
         return userMapper.map(user);
     }
 
-    public UserDTO update(UserModifyDTO data, Long id) {
+    public UserDTO update(UserDTO data, Long id) {
         var user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format("User with ID %s not found", id)));
+                .orElseThrow(EntityNotFoundException::new);
         userMapper.update(data, user);
 
         if (data.getPassword() != null) {
@@ -67,15 +66,7 @@ public final class UserService implements UserDetailsManager {
     }
 
     public void delete(Long id) {
-        var user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format("User with ID %s not found", id)));
-        var tasks = user.getTasks();
-
-        if (tasks.isEmpty()) {
-            userRepository.deleteById(id);
-        } else {
-            throw new RuntimeException("User has active tasks");
-        }
+        userRepository.deleteById(id);
     }
 
     @Override

@@ -1,7 +1,6 @@
 package hexlet.code.controller;
 
-import hexlet.code.dto.task.TaskDTO;
-import hexlet.code.dto.task.TaskModifyDTO;
+import hexlet.code.dto.TaskDTO;
 import hexlet.code.dto.TaskParamsDTO;
 import hexlet.code.repository.TaskRepository;
 import hexlet.code.service.TaskService;
@@ -31,14 +30,6 @@ public final class TaskController {
     @Autowired
     private TaskService taskService;
 
-    @GetMapping(path = "/{id}")
-    public ResponseEntity<TaskDTO> show(@PathVariable Long id) {
-        var task = taskService.findById(id);
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(task);
-    }
-
     @GetMapping(path = "")
     public ResponseEntity<List<TaskDTO>> index(TaskParamsDTO params) {
         var tasks = taskService.getAll(params);
@@ -48,32 +39,22 @@ public final class TaskController {
                 .body(tasks);
     }
 
+    @GetMapping(path = "/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public TaskDTO show(@PathVariable Long id) {
+        return taskService.findById(id);
+    }
+
     @PostMapping(path = "")
-    public ResponseEntity<TaskDTO> create(@Valid @RequestBody TaskModifyDTO data) {
-        try {
-            var task = taskService.create(data);
-            return ResponseEntity
-                    .status(HttpStatus.CREATED)
-                    .body(task);
-        } catch (Exception e) {
-            return ResponseEntity
-                    .status(HttpStatus.FORBIDDEN)
-                    .build();
-        }
+    @ResponseStatus(HttpStatus.CREATED)
+    public TaskDTO create(@Valid @RequestBody TaskDTO data) {
+        return taskService.create(data);
     }
 
     @PutMapping(path = "/{id}")
-    public ResponseEntity<TaskDTO> update(@Valid @RequestBody TaskModifyDTO data, @PathVariable Long id) {
-        try {
-            var task = taskService.update(data, id);
-            return ResponseEntity
-                    .status(HttpStatus.OK)
-                    .body(task);
-        } catch (Exception e) {
-            return ResponseEntity
-                    .status(HttpStatus.FORBIDDEN)
-                    .build();
-        }
+    @ResponseStatus(HttpStatus.OK)
+    public TaskDTO update(@Valid @RequestBody TaskDTO data, @PathVariable Long id) {
+        return taskService.update(data, id);
     }
 
     @DeleteMapping(path = "/{id}")

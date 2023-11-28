@@ -1,7 +1,6 @@
 package hexlet.code.controller;
 
-import hexlet.code.dto.user.UserModifyDTO;
-import hexlet.code.dto.user.UserDTO;
+import hexlet.code.dto.UserDTO;
 import hexlet.code.service.UserService;
 import hexlet.code.util.UserUtils;
 import jakarta.validation.Valid;
@@ -31,22 +30,6 @@ public final class UserController {
     @Autowired
     private UserUtils userUtils;
 
-    @GetMapping(path = "/{id}")
-    public ResponseEntity<UserDTO> show(@PathVariable Long id) {
-        var currentUser = userUtils.getCurrentUser();
-
-        if (!Objects.equals(currentUser.getId(), id)) {
-            return ResponseEntity
-                    .status(HttpStatus.FORBIDDEN)
-                    .build();
-        } else {
-            var user = userService.findById(id);
-            return ResponseEntity
-                    .status(HttpStatus.OK)
-                    .body(user);
-        }
-    }
-
     @GetMapping(path = "")
     public ResponseEntity<List<UserDTO>> index() {
         var users = userService.getAll();
@@ -56,40 +39,30 @@ public final class UserController {
                 .body(users);
     }
 
+    @GetMapping(path = "/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public UserDTO show(@PathVariable Long id) {
+        var currentUser = userUtils.getCurrentUser();
+        return userService.findById(id);
+    }
+
     @PostMapping(path = "")
-    public ResponseEntity<UserDTO> create(@Valid @RequestBody UserModifyDTO data) {
-        try {
-            var user = userService.create(data);
-            return ResponseEntity
-                    .status(HttpStatus.CREATED)
-                    .body(user);
-        } catch (Exception e) {
-            return ResponseEntity
-                    .status(HttpStatus.FORBIDDEN)
-                    .build();
-        }
+    @ResponseStatus(HttpStatus.CREATED)
+    public UserDTO create(@Valid @RequestBody UserDTO data) {
+        return userService.create(data);
     }
 
     @PutMapping(path = "/{id}")
-    public ResponseEntity<UserDTO> update(@Valid @RequestBody UserModifyDTO data, @PathVariable Long id) {
+    @ResponseStatus(HttpStatus.OK)
+    public UserDTO update(@Valid @RequestBody UserDTO data, @PathVariable Long id) {
         var currentUser = userUtils.getCurrentUser();
+        var user = new UserDTO();
 
-        if (!Objects.equals(currentUser.getId(), id)) {
-            return ResponseEntity
-                    .status(HttpStatus.UNAUTHORIZED)
-                    .build();
-        } else {
-            try {
-                var user = userService.update(data, id);
-                return ResponseEntity
-                        .status(HttpStatus.OK)
-                        .body(user);
-            } catch (Exception e) {
-                return ResponseEntity
-                        .status(HttpStatus.FORBIDDEN)
-                        .build();
-            }
+        if (Objects.equals(currentUser.getId(), id)) {
+            user = userService.update(data, id);
         }
+
+        return user;
     }
 
     @DeleteMapping(path = "/{id}")

@@ -1,10 +1,9 @@
 package hexlet.code.service;
 
-import hexlet.code.dto.task_status.TaskStatusDTO;
-import hexlet.code.dto.task_status.TaskStatusModifyDTO;
-import hexlet.code.exception.ResourceNotFoundException;
+import hexlet.code.dto.TaskStatusDTO;
 import hexlet.code.mapper.TaskStatusMapper;
 import hexlet.code.repository.TaskStatusRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,36 +27,25 @@ public final class TaskStatusService {
 
     public TaskStatusDTO findById(Long id) {
         var taskStatus = taskStatusRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        String.format("Task status with ID %s not found", id)));
+                .orElseThrow(EntityNotFoundException::new);
         return taskStatusMapper.map(taskStatus);
     }
 
-    public TaskStatusDTO create(TaskStatusModifyDTO data) {
+    public TaskStatusDTO create(TaskStatusDTO data) {
         var taskStatus = taskStatusMapper.map(data);
         taskStatusRepository.save(taskStatus);
         return taskStatusMapper.map(taskStatus);
     }
 
-    public TaskStatusDTO update(TaskStatusModifyDTO data, Long id) {
+    public TaskStatusDTO update(TaskStatusDTO data, Long id) {
         var taskStatus = taskStatusRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        String.format("Task status with ID %s not found", id)));
+                .orElseThrow(EntityNotFoundException::new);
         taskStatusMapper.update(data, taskStatus);
         taskStatusRepository.save(taskStatus);
         return taskStatusMapper.map(taskStatus);
     }
 
     public void delete(Long id) {
-        var taskStatus = taskStatusRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        String.format("Task status with ID %s not found", id)));
-        var tasks = taskStatus.getTasks();
-
-        if (tasks.isEmpty()) {
-            taskStatusRepository.deleteById(id);
-        } else {
-            throw new RuntimeException("Task status has active tasks");
-        }
+        taskStatusRepository.deleteById(id);
     }
 }

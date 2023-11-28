@@ -1,9 +1,7 @@
 package hexlet.code.service;
 
 import hexlet.code.dto.TaskParamsDTO;
-import hexlet.code.dto.task.TaskDTO;
-import hexlet.code.dto.task.TaskModifyDTO;
-import hexlet.code.exception.ResourceNotFoundException;
+import hexlet.code.dto.TaskDTO;
 import hexlet.code.mapper.TaskMapper;
 import hexlet.code.model.Label;
 import hexlet.code.repository.LabelRepository;
@@ -11,6 +9,7 @@ import hexlet.code.repository.TaskRepository;
 import hexlet.code.repository.TaskStatusRepository;
 import hexlet.code.repository.UserRepository;
 import hexlet.code.specification.TaskSpecification;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -47,11 +46,11 @@ public final class TaskService {
 
     public TaskDTO findById(Long id) {
         var task = taskRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format("Task with ID %s not found", id)));
+                .orElseThrow(EntityNotFoundException::new);
         return taskMapper.map(task);
     }
 
-    public TaskDTO create(TaskModifyDTO data) {
+    public TaskDTO create(TaskDTO data) {
         var task = taskMapper.map(data);
 
         if (data.getContent() == null) {
@@ -79,9 +78,9 @@ public final class TaskService {
         return taskMapper.map(taskRepository.findByName(data.getTitle()).get());
     }
 
-    public TaskDTO update(TaskModifyDTO data, Long id) {
+    public TaskDTO update(TaskDTO data, Long id) {
         var task = taskRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format("Task with ID %s not found", id)));
+                .orElseThrow(EntityNotFoundException::new);
         taskMapper.update(data, task);
 
         var assignee = data.getAssigneeId() == null ? null : userRepository.findById(data.getAssigneeId()).get();
@@ -111,7 +110,7 @@ public final class TaskService {
 
     public void delete(Long id) {
         var task = taskRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format("Task with ID %s not found", id)));
+                .orElseThrow(EntityNotFoundException::new);
 
         if (!task.getLabels().isEmpty()) {
             for (Label item : task.getLabels()) {

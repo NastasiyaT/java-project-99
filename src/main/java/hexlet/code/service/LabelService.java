@@ -1,10 +1,9 @@
 package hexlet.code.service;
 
-import hexlet.code.dto.label.LabelModifyDTO;
-import hexlet.code.dto.label.LabelDTO;
-import hexlet.code.exception.ResourceNotFoundException;
+import hexlet.code.dto.LabelDTO;
 import hexlet.code.mapper.LabelMapper;
 import hexlet.code.repository.LabelRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,31 +27,25 @@ public final class LabelService {
 
     public LabelDTO findById(Long id) {
         var label = labelRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format("Label with ID %s not found", id)));
+                .orElseThrow(EntityNotFoundException::new);
         return labelMapper.map(label);
     }
 
-    public LabelDTO create(LabelModifyDTO data) {
+    public LabelDTO create(LabelDTO data) {
         var label = labelMapper.map(data);
         labelRepository.save(label);
         return labelMapper.map(label);
     }
 
-    public LabelDTO update(LabelModifyDTO data, Long id) {
+    public LabelDTO update(LabelDTO data, Long id) {
         var label = labelRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format("Label with ID %s not found", id)));
+                .orElseThrow(EntityNotFoundException::new);
         labelMapper.update(data, label);
         labelRepository.save(label);
         return labelMapper.map(label);
     }
 
     public void delete(Long id) {
-        var label = labelRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format("Label with ID %s not found", id)));
-        if (label.getTasks().isEmpty()) {
-            labelRepository.deleteById(id);
-        } else {
-            throw new RuntimeException("Label has active tasks");
-        }
+        labelRepository.deleteById(id);
     }
 }

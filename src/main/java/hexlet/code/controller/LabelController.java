@@ -1,7 +1,6 @@
 package hexlet.code.controller;
 
-import hexlet.code.dto.label.LabelModifyDTO;
-import hexlet.code.dto.label.LabelDTO;
+import hexlet.code.dto.LabelDTO;
 import hexlet.code.repository.LabelRepository;
 import hexlet.code.service.LabelService;
 import jakarta.validation.Valid;
@@ -30,14 +29,6 @@ public final class LabelController {
     @Autowired
     private LabelService labelService;
 
-    @GetMapping(path = "/{id}")
-    public ResponseEntity<LabelDTO> show(@PathVariable Long id) {
-        var label = labelService.findById(id);
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(label);
-    }
-
     @GetMapping(path = "")
     public ResponseEntity<List<LabelDTO>> index() {
         var labels = labelService.getAll();
@@ -47,32 +38,22 @@ public final class LabelController {
                 .body(labels);
     }
 
+    @GetMapping(path = "/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public LabelDTO show(@PathVariable Long id) {
+        return labelService.findById(id);
+    }
+
     @PostMapping(path = "")
-    public ResponseEntity<LabelDTO> create(@Valid @RequestBody LabelModifyDTO data) {
-        try {
-            var label = labelService.create(data);
-            return ResponseEntity
-                    .status(HttpStatus.CREATED)
-                    .body(label);
-        } catch (Exception e) {
-            return ResponseEntity
-                    .status(HttpStatus.FORBIDDEN)
-                    .build();
-        }
+    @ResponseStatus(HttpStatus.CREATED)
+    public LabelDTO create(@Valid @RequestBody LabelDTO data) {
+        return labelService.create(data);
     }
 
     @PutMapping(path = "/{id}")
-    public ResponseEntity<LabelDTO> update(@Valid @RequestBody LabelModifyDTO data, @PathVariable Long id) {
-        try {
-            var label = labelService.update(data, id);
-            return ResponseEntity
-                    .status(HttpStatus.OK)
-                    .body(label);
-        } catch (Exception e) {
-            return ResponseEntity
-                    .status(HttpStatus.FORBIDDEN)
-                    .build();
-        }
+    @ResponseStatus(HttpStatus.OK)
+    public LabelDTO update(@Valid @RequestBody LabelDTO data, @PathVariable Long id) {
+        return labelService.update(data, id);
     }
 
     @DeleteMapping(path = "/{id}")

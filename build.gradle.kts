@@ -78,7 +78,7 @@ buildscript {
 	}
 }
 
-var env = System.getenv("APP_ENV")
+val env = System.getenv("APP_ENV")
 if (env != null && env.equals("prod")) {
 	sentry {
 		includeSourceContext = true

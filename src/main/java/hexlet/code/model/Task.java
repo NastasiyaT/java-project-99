@@ -1,5 +1,6 @@
 package hexlet.code.model;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.FetchType;
@@ -50,7 +51,7 @@ public final class Task implements BaseEntity {
     @JoinColumn(name = "task_status_slug", nullable = false)
     private TaskStatus taskStatus;
 
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.MERGE)
     private Set<Label> labels = new HashSet<>();
 
     public void addLabel(Label label) {

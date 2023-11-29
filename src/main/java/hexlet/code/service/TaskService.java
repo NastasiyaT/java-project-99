@@ -4,7 +4,6 @@ import hexlet.code.dto.TaskParamsDTO;
 import hexlet.code.dto.TaskDTO;
 import hexlet.code.mapper.TaskMapper;
 import hexlet.code.model.Label;
-import hexlet.code.model.Task;
 import hexlet.code.repository.LabelRepository;
 import hexlet.code.repository.TaskRepository;
 import hexlet.code.repository.TaskStatusRepository;
@@ -58,7 +57,26 @@ public final class TaskService {
             task.setDescription("No description provided");
         }
 
-        modify(task, data);
+        if (!data.getTaskLabelIds().isEmpty()) {
+            for (Label label : task.getLabels()) {
+                task.addLabel(label);
+                labelRepository.save(label);
+            }
+        }
+
+        var taskStatus = taskStatusRepository.findBySlug(data.getStatus()).get();
+        task.setTaskStatus(taskStatus);
+        taskStatus.getTasks().add(task);
+        taskStatusRepository.save(task.getTaskStatus());
+
+        var taskSaved = taskRepository.findByName(task.getName()).get();
+        var assignee = data.getAssigneeId() == null ? null : userRepository.findById(data.getAssigneeId()).get();
+        taskSaved.setAssignee(assignee);
+        if (assignee != null) {
+            assignee.getTasks().add(taskSaved);
+            userRepository.save(assignee);
+        }
+
         return taskMapper.map(task);
     }
 
@@ -66,8 +84,28 @@ public final class TaskService {
         var task = taskRepository.findById(id)
                 .orElseThrow(EntityNotFoundException::new);
         taskMapper.update(data, task);
-        modify(task, data);
-        taskRepository.save(task);
+
+        if (!data.getTaskLabelIds().isEmpty()) {
+            for (Label label : task.getLabels()) {
+                task.addLabel(label);
+                labelRepository.save(label);
+            }
+        }
+
+        var taskStatus = data.getStatus() == null ? null : taskStatusRepository.findBySlug(data.getStatus()).get();
+        if (taskStatus != null) {
+            task.setTaskStatus(taskStatus);
+            taskStatus.getTasks().add(task);
+            taskStatusRepository.save(task.getTaskStatus());
+        }
+
+        var assignee = data.getAssigneeId() == null ? null : userRepository.findById(data.getAssigneeId()).get();
+        task.setAssignee(assignee);
+        if (assignee != null) {
+            assignee.getTasks().add(task);
+            userRepository.save(assignee);
+        }
+
         return taskMapper.map(task);
     }
 
@@ -93,28 +131,5 @@ public final class TaskService {
         taskStatusRepository.save(taskStatus);
 
         taskRepository.deleteById(id);
-    }
-
-    private void modify(Task task, TaskDTO data) {
-        var assignee = data.getAssigneeId() == null ? null : userRepository.findById(data.getAssigneeId()).get();
-        task.setAssignee(assignee);
-        if (assignee != null) {
-            assignee.getTasks().add(task);
-            userRepository.save(assignee);
-        }
-
-        if (data.getStatus() != null) {
-            var taskStatus = taskStatusRepository.findBySlug(data.getStatus()).get();
-            task.setTaskStatus(taskStatus);
-            taskStatus.getTasks().add(task);
-            taskStatusRepository.save(taskStatus);
-        }
-
-        if (!data.getTaskLabelIds().isEmpty()) {
-            for (Label label : task.getLabels()) {
-                task.addLabel(label);
-                labelRepository.save(label);
-            }
-        }
     }
 }

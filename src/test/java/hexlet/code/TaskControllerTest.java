@@ -147,6 +147,7 @@ public final class TaskControllerTest {
     public void testCreate() throws Exception {
         var taskDTO = Instancio.of(modelGenerator.getTaskDTOModel()).create();
         taskDTO.setStatus(testTaskStatus.getSlug());
+        taskDTO.setAssigneeId(testUser.getId());
 
         var request = post("/api/tasks").with(token)
                 .contentType(MediaType.APPLICATION_JSON)

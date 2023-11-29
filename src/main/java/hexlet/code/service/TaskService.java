@@ -77,7 +77,7 @@ public final class TaskService {
             userRepository.save(assignee);
         }
 
-        return taskMapper.map(task);
+        return taskMapper.map(taskSaved);
     }
 
     public TaskDTO update(TaskDTO data, Long id) {

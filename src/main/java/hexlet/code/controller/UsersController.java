@@ -1,9 +1,8 @@
 package hexlet.code.controller;
 
-import hexlet.code.dto.TaskDTO;
-import hexlet.code.dto.TaskParamsDTO;
-import hexlet.code.repository.TaskRepository;
-import hexlet.code.service.TaskService;
+import hexlet.code.dto.UserDTO;
+import hexlet.code.service.UserService;
+import hexlet.code.util.UserUtils;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,47 +18,60 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Objects;
 
 @RestController
-@RequestMapping("/api/tasks")
-public final class TaskController {
+@RequestMapping("/api/users")
+public final class UsersController {
 
     @Autowired
-    private TaskRepository taskRepository;
+    private UserService userService;
 
     @Autowired
-    private TaskService taskService;
+    private UserUtils userUtils;
 
     @GetMapping(path = "")
-    public ResponseEntity<List<TaskDTO>> index(TaskParamsDTO params) {
-        var tasks = taskService.getAll(params);
+    public ResponseEntity<List<UserDTO>> index() {
+        var users = userService.getAll();
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .header("X-Total-Count", String.valueOf(tasks.size()))
-                .body(tasks);
+                .header("X-Total-Count", String.valueOf(users.size()))
+                .body(users);
     }
 
     @GetMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public TaskDTO show(@PathVariable Long id) {
-        return taskService.findById(id);
+    public UserDTO show(@PathVariable Long id) {
+        var currentUser = userUtils.getCurrentUser();
+        return userService.findById(id);
     }
 
     @PostMapping(path = "")
     @ResponseStatus(HttpStatus.CREATED)
-    public TaskDTO create(@Valid @RequestBody TaskDTO data) {
-        return taskService.create(data);
+    public UserDTO create(@Valid @RequestBody UserDTO data) {
+        return userService.create(data);
     }
 
     @PutMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public TaskDTO update(@Valid @RequestBody TaskDTO data, @PathVariable Long id) {
-        return taskService.update(data, id);
+    public UserDTO update(@Valid @RequestBody UserDTO data, @PathVariable Long id) {
+        var currentUser = userUtils.getCurrentUser();
+        var user = new UserDTO();
+
+        if (Objects.equals(currentUser.getId(), id)) {
+            user = userService.update(data, id);
+        }
+
+        return user;
     }
 
     @DeleteMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id) {
-        taskService.delete(id);
+        var currentUser = userUtils.getCurrentUser();
+
+        if (Objects.equals(currentUser.getId(), id)) {
+            userService.delete(id);
+        }
     }
 }

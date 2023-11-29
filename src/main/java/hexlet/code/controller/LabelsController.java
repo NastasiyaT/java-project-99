@@ -21,7 +21,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/labels")
-public final class LabelController {
+public final class LabelsController {
 
     @Autowired
     private LabelRepository labelRepository;

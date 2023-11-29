@@ -104,6 +104,8 @@ public final class TaskService {
         if (assignee != null) {
             assignee.getTasks().add(task);
             userRepository.save(assignee);
+        } else {
+            taskRepository.save(task);
         }
 
         return taskMapper.map(task);

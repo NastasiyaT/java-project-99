@@ -79,7 +79,7 @@ buildscript {
 }
 
 val env = System.getenv("APP_ENV")
-if (env != null && env.equals("prod")) {
+if (env!!.contentEquals("prod")) {
 	sentry {
 		includeSourceContext = true
 		org = "anastasiya-trusova"

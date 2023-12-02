@@ -30,7 +30,7 @@ public final class LabelsController {
     private LabelService labelService;
 
     @GetMapping(path = "")
-    public ResponseEntity<List<LabelDTO>> index() {
+    public ResponseEntity<List<LabelDTO>> getAll() {
         var labels = labelService.getAll();
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -40,7 +40,7 @@ public final class LabelsController {
 
     @GetMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public LabelDTO show(@PathVariable Long id) {
+    public LabelDTO getById(@PathVariable Long id) {
         return labelService.findById(id);
     }
 

@@ -3,7 +3,6 @@ package hexlet.code.service;
 import hexlet.code.dto.LabelDTO;
 import hexlet.code.mapper.LabelMapper;
 import hexlet.code.repository.LabelRepository;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,8 +25,7 @@ public final class LabelService {
     }
 
     public LabelDTO findById(Long id) {
-        var label = labelRepository.findById(id)
-                .orElseThrow(EntityNotFoundException::new);
+        var label = labelRepository.findById(id).orElseThrow();
         return labelMapper.map(label);
     }
 
@@ -38,8 +36,7 @@ public final class LabelService {
     }
 
     public LabelDTO update(LabelDTO data, Long id) {
-        var label = labelRepository.findById(id)
-                .orElseThrow(EntityNotFoundException::new);
+        var label = labelRepository.findById(id).orElseThrow();
         labelMapper.update(data, label);
         labelRepository.save(label);
         return labelMapper.map(label);

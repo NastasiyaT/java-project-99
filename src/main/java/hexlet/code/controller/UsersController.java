@@ -31,7 +31,7 @@ public final class UsersController {
     private UserUtils userUtils;
 
     @GetMapping(path = "")
-    public ResponseEntity<List<UserDTO>> index() {
+    public ResponseEntity<List<UserDTO>> getAll() {
         var users = userService.getAll();
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -41,8 +41,7 @@ public final class UsersController {
 
     @GetMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public UserDTO show(@PathVariable Long id) {
-        var currentUser = userUtils.getCurrentUser();
+    public UserDTO getById(@PathVariable Long id) {
         return userService.findById(id);
     }
 
@@ -66,12 +65,18 @@ public final class UsersController {
     }
 
     @DeleteMapping(path = "/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable Long id) {
+    public ResponseEntity<UserDTO> delete(@PathVariable Long id) {
         var currentUser = userUtils.getCurrentUser();
 
         if (Objects.equals(currentUser.getId(), id)) {
             userService.delete(id);
+            return ResponseEntity
+                    .status(HttpStatus.NO_CONTENT)
+                    .build();
+        } else {
+            return ResponseEntity
+                    .status(HttpStatus.FORBIDDEN)
+                    .build();
         }
     }
 }

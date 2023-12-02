@@ -5,7 +5,7 @@ import hexlet.code.mapper.UserMapper;
 import hexlet.code.model.User;
 import hexlet.code.repository.UserRepository;
 import hexlet.code.util.UserUtils;
-import jakarta.persistence.EntityNotFoundException;
+import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -38,8 +38,7 @@ public final class UserService implements UserDetailsManager {
     }
 
     public UserDTO findById(Long id) {
-        var user = userRepository.findById(id)
-                .orElseThrow(EntityNotFoundException::new);
+        var user = userRepository.findById(id).orElseThrow();
         return userMapper.map(user);
     }
 
@@ -52,8 +51,7 @@ public final class UserService implements UserDetailsManager {
     }
 
     public UserDTO update(UserDTO data, Long id) {
-        var user = userRepository.findById(id)
-                .orElseThrow(EntityNotFoundException::new);
+        var user = userRepository.findById(id).orElseThrow();
         userMapper.update(data, user);
 
         if (data.getPassword() != null) {
@@ -86,21 +84,21 @@ public final class UserService implements UserDetailsManager {
 
     @Override
     public void updateUser(UserDetails user) {
-        throw new UnsupportedOperationException("Unimplemented method 'updateUser'");
+        throw new NotImplementedException("Unimplemented method 'updateUser'");
     }
 
     @Override
     public void deleteUser(String username) {
-        throw new UnsupportedOperationException("Unimplemented method 'deleteUser'");
+        throw new NotImplementedException("Unimplemented method 'deleteUser'");
     }
 
     @Override
     public void changePassword(String oldPassword, String newPassword) {
-        throw new UnsupportedOperationException("Unimplemented method 'changePassword'");
+        throw new NotImplementedException("Unimplemented method 'changePassword'");
     }
 
     @Override
     public boolean userExists(String username) {
-        throw new UnsupportedOperationException("Unimplemented method 'userExists'");
+        throw new NotImplementedException("Unimplemented method 'userExists'");
     }
 }

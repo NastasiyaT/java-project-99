@@ -1,6 +1,7 @@
 package hexlet.code;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import hexlet.code.dto.UserDTO;
 import hexlet.code.model.User;
 import hexlet.code.repository.UserRepository;
 import hexlet.code.util.ModelGenerator;
@@ -14,8 +15,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.HashMap;
+import java.time.LocalDate;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -53,10 +55,18 @@ public final class UsersControllerTest {
 
     @AfterEach
     public void clear() {
-        userRepository.deleteAll();    }
+        userRepository.deleteAll();
+    }
 
     @Test
-    public void testShow() throws Exception {
+    public void testGetAll() throws Exception {
+        var request = get("/api/users").with(token);
+        mockMvc.perform(request)
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void testGetById() throws Exception {
         var userId = testUser.getId();
         var request = get("/api/users/" + userId).with(token);
         mockMvc.perform(request)
@@ -64,29 +74,29 @@ public final class UsersControllerTest {
     }
 
     @Test
-    public void testIndex() throws Exception {
-        var request = get("/api/users").with(token);
-        mockMvc.perform(request)
-                .andExpect(status().isOk());
-    }
-
-    @Test
     public void testCreate() throws Exception {
         var userDTO = Instancio.of(modelGenerator.getUserDTOModel()).create();
+
         var request = post("/api/users").with(token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(om.writeValueAsString(userDTO));
 
         mockMvc.perform(request)
                 .andExpect(status().isCreated());
+
+        var user = userRepository.findByEmail(userDTO.getEmail()).get();
+        assertThat(user.getId()).isNotNull();
+        assertThat(user.getCreatedAt()).isBeforeOrEqualTo(LocalDate.now());
+        assertThat(user.getPassword()).doesNotMatch(userDTO.getPassword());
+        assertThat(user.getLastName()).isEqualTo(userDTO.getLastName());
     }
 
     @Test
     public void testUpdate() throws Exception {
         var userId = testUser.getId();
 
-        var data = new HashMap<>();
-        data.put("firstName", "Gregory");
+        var data = new UserDTO();
+        data.setFirstName("Gregory");
 
         var request = put("/api/users/" + userId).with(token)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -94,6 +104,9 @@ public final class UsersControllerTest {
 
         mockMvc.perform(request)
                 .andExpect(status().isOk());
+
+        var user = userRepository.getReferenceById(userId);
+        assertThat(user.getFirstName()).isEqualTo("Gregory");
     }
 
     @Test

@@ -1,6 +1,7 @@
 package hexlet.code;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import hexlet.code.dto.TaskDTO;
 import hexlet.code.model.Label;
 import hexlet.code.model.Task;
 import hexlet.code.model.TaskStatus;
@@ -20,8 +21,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.HashMap;
+import java.time.LocalDate;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -97,16 +99,16 @@ public final class TasksControllerTest {
     }
 
     @Test
-    public void testShow() throws Exception {
-        var taskId = testTask.getId();
-        var request = get("/api/tasks/" + taskId).with(token);
+    public void testGetAll() throws Exception {
+        var request = get("/api/tasks").with(token);
         mockMvc.perform(request)
                 .andExpect(status().isOk());
     }
 
     @Test
-    public void testIndex() throws Exception {
-        var request = get("/api/tasks").with(token);
+    public void testGetById() throws Exception {
+        var taskId = testTask.getId();
+        var request = get("/api/tasks/" + taskId).with(token);
         mockMvc.perform(request)
                 .andExpect(status().isOk());
     }
@@ -155,14 +157,20 @@ public final class TasksControllerTest {
 
         mockMvc.perform(request)
                 .andExpect(status().isCreated());
+
+        var task = taskRepository.findByName(taskDTO.getTitle()).get();
+        assertThat(task.getId()).isNotNull();
+        assertThat(task.getCreatedAt()).isBeforeOrEqualTo(LocalDate.now());
+        assertThat(task.getAssignee().getId()).isEqualTo(testUser.getId());
+        assertThat(task.getTaskStatus().getSlug()).isEqualTo(testTaskStatus.getSlug());
     }
 
     @Test
     public void testUpdate() throws Exception {
         var taskId = testTask.getId();
 
-        var data = new HashMap<>();
-        data.put("content", "Go shopping");
+        var data = new TaskDTO();
+        data.setContent("Go shopping");
 
         var request = put("/api/tasks/" + taskId).with(token)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -170,6 +178,9 @@ public final class TasksControllerTest {
 
         mockMvc.perform(request)
                 .andExpect(status().isOk());
+
+        var task = taskRepository.getReferenceById(taskId);
+        assertThat(task.getDescription()).isEqualTo("Go shopping");
     }
 
     @Test

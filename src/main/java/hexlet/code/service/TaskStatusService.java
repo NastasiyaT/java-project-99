@@ -3,7 +3,6 @@ package hexlet.code.service;
 import hexlet.code.dto.TaskStatusDTO;
 import hexlet.code.mapper.TaskStatusMapper;
 import hexlet.code.repository.TaskStatusRepository;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,8 +25,7 @@ public final class TaskStatusService {
     }
 
     public TaskStatusDTO findById(Long id) {
-        var taskStatus = taskStatusRepository.findById(id)
-                .orElseThrow(EntityNotFoundException::new);
+        var taskStatus = taskStatusRepository.findById(id).orElseThrow();
         return taskStatusMapper.map(taskStatus);
     }
 
@@ -38,8 +36,7 @@ public final class TaskStatusService {
     }
 
     public TaskStatusDTO update(TaskStatusDTO data, Long id) {
-        var taskStatus = taskStatusRepository.findById(id)
-                .orElseThrow(EntityNotFoundException::new);
+        var taskStatus = taskStatusRepository.findById(id).orElseThrow();
         taskStatusMapper.update(data, taskStatus);
         taskStatusRepository.save(taskStatus);
         return taskStatusMapper.map(taskStatus);

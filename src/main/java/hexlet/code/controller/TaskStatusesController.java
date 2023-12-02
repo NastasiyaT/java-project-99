@@ -26,7 +26,7 @@ public final class TaskStatusesController {
     private TaskStatusService taskStatusService;
 
     @GetMapping(path = "")
-    public ResponseEntity<List<TaskStatusDTO>> index() {
+    public ResponseEntity<List<TaskStatusDTO>> getAll() {
         var taskStatuses = taskStatusService.getAll();
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -36,7 +36,7 @@ public final class TaskStatusesController {
 
     @GetMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public TaskStatusDTO show(@PathVariable Long id) {
+    public TaskStatusDTO getById(@PathVariable Long id) {
         return taskStatusService.findById(id);
     }
 

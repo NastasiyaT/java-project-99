@@ -1,6 +1,7 @@
 package hexlet.code;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import hexlet.code.dto.LabelDTO;
 import hexlet.code.model.Label;
 import hexlet.code.model.User;
 import hexlet.code.repository.LabelRepository;
@@ -16,8 +17,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.HashMap;
+import java.time.LocalDate;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -68,16 +70,16 @@ public final class LabelsControllerTest {
     }
 
     @Test
-    public void testShow() throws Exception {
-        var labelId = testLabel.getId();
-        var request = get("/api/labels/" + labelId).with(token);
+    public void testGetAll() throws Exception {
+        var request = get("/api/labels").with(token);
         mockMvc.perform(request)
                 .andExpect(status().isOk());
     }
 
     @Test
-    public void testIndex() throws Exception {
-        var request = get("/api/labels").with(token);
+    public void testGetById() throws Exception {
+        var labelId = testLabel.getId();
+        var request = get("/api/labels/" + labelId).with(token);
         mockMvc.perform(request)
                 .andExpect(status().isOk());
     }
@@ -99,14 +101,18 @@ public final class LabelsControllerTest {
 
         mockMvc.perform(request)
                 .andExpect(status().isCreated());
+
+        var label = labelRepository.findByName(labelDTO.getName()).get();
+        assertThat(label.getId()).isNotNull();
+        assertThat(label.getCreatedAt()).isBeforeOrEqualTo(LocalDate.now());
     }
 
     @Test
     public void testUpdate() throws Exception {
         var labelId = testLabel.getId();
 
-        var data = new HashMap<>();
-        data.put("name", "new name");
+        var data = new LabelDTO();
+        data.setName("new name");
 
         var request = put("/api/labels/" + labelId).with(token)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -114,6 +120,9 @@ public final class LabelsControllerTest {
 
         mockMvc.perform(request)
                 .andExpect(status().isOk());
+
+        var label = labelRepository.getReferenceById(labelId);
+        assertThat(label.getName()).isEqualTo("new name");
     }
 
     @Test

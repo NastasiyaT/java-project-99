@@ -54,16 +54,6 @@ public final class Task implements BaseEntity {
     @ManyToMany(cascade = CascadeType.MERGE)
     private Set<Label> labels = new HashSet<>();
 
-    public void addLabel(Label label) {
-        labels.add(label);
-        label.getTasks().add(this);
-    }
-
-    public void removeLabel(Label label) {
-        labels.remove(label);
-        label.getTasks().remove(this);
-    }
-
     public Set<Long> getLabelIds() {
         return labels.stream()
                 .map(Label::getId)

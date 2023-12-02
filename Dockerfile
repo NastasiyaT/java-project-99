@@ -1,7 +1,6 @@
 FROM eclipse-temurin:20-jdk
 
 ARG GRADLE_VERSION=8.3
-ENV APP_ENV=
 
 RUN apt-get update && apt-get install -yq make unzip
 

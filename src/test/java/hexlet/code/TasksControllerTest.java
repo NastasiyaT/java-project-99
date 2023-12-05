@@ -76,18 +76,14 @@ public final class TasksControllerTest {
         testTaskStatus = Instancio.of(modelGenerator.getTaskStatusModel()).create();
         taskStatusRepository.save(testTaskStatus);
 
+        testLabel = Instancio.of(modelGenerator.getLabelModel()).create();
+        labelRepository.save(testLabel);
+
         testTask = Instancio.of(modelGenerator.getTaskModel()).create();
         testTask.setAssignee(testUser);
         testTask.setTaskStatus(testTaskStatus);
-        taskRepository.save(testTask);
-
-        testTaskStatus.getTasks().add(testTask);
-        taskStatusRepository.save(testTaskStatus);
-
-        testLabel = Instancio.of(modelGenerator.getLabelModel()).create();
         testTask.getLabels().add(testLabel);
-        testLabel.getTasks().add(testTask);
-        labelRepository.save(testLabel);
+        taskRepository.save(testTask);
     }
 
     @AfterEach

@@ -20,7 +20,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "tasks")
@@ -39,7 +38,6 @@ public final class Task implements BaseEntity {
     private LocalDate createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "assignee_id")
     private User assignee;
 
     @NotBlank
@@ -48,16 +46,10 @@ public final class Task implements BaseEntity {
     private String description;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "task_status_slug", nullable = false)
+    @JoinColumn(nullable = false)
     private TaskStatus taskStatus;
 
     @ManyToMany(cascade = CascadeType.MERGE)
     private Set<Label> labels = new HashSet<>();
-
-    public Set<Long> getLabelIds() {
-        return labels.stream()
-                .map(Label::getId)
-                .collect(Collectors.toSet());
-    }
 }
 

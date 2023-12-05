@@ -79,8 +79,8 @@ buildscript {
 }
 
 val env = System.getenv("APP_ENV")
-if (env != null && env.contentEquals("prod")) {
-	sentry {
+sentry {
+	if (env != null && env.contentEquals("prod")) {
 		includeSourceContext = true
 		org = "anastasiya-trusova"
 		projectName = "java-spring-boot"

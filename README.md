@@ -3,4 +3,6 @@
 [![Java CI](https://github.com/NastasiyaT/java-project-99/actions/workflows/java-ci-check.yml/badge.svg?branch=main)](https://github.com/NastasiyaT/java-project-99/actions/workflows/java-ci-check.yml)
 [![Maintainability](https://api.codeclimate.com/v1/badges/ddc4faf736226eb00cfc/maintainability)](https://codeclimate.com/github/NastasiyaT/java-project-99/maintainability)
 <a href="https://codeclimate.com/github/NastasiyaT/java-project-99/test_coverage"><img src="https://api.codeclimate.com/v1/badges/ddc4faf736226eb00cfc/test_coverage" /></a>
+### About the project
+It is a simple `Task Manager` application. User can log in, create new task, change its status and add labels.
 ### Demo: https://taskmanager-846q.onrender.com
